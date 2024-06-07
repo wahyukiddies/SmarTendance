@@ -33,7 +33,7 @@ sudo apt install -y virtualenv
 python -m venv .venv
 
 # Activate virtualenv
-source 
+source .venv/Scripts/activate
 
 # Installing requirements
 pip install -r requirements.txt
