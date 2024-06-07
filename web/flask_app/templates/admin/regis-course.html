@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/regis-form.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}" />
+    <title>Admin | Course Registration</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img src="{{url_for('static', filename='images/logo.png')}}" alt="Logo SmarTandance" />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"><i class="bx bxs-dashboard"></i>Dashboard</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"><i class="bx bxs-graduation"></i>Course</a>
+        </li>
+        <li class="active">
+          <a href="{{url_for('admin_ep.add')}}"><i class="bx bx-group"></i>Registration</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"><i class="bx bxs-door-open"></i>Class</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.view_attendance')}}"><i class="bx bx-data"></i>Attendance Logs</a>
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a href="#" class="logout" id="logout-button" data-logout-url="{{url_for('user_ep.logout')}}">
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none;">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"></label>
+        <a href="#" class="profile">
+          <img src="{{url_for('static', filename='images/profile_logo.png')}}" />
+        </a>
+      </nav>
+      <!-- End of Navbar -->
+
+      <!-- Main Content -->
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Course Registration</h1>
+            <ul class="breadcrumb">
+              <a href="{{url_for('admin_ep.add')}}"><li>Registration</li></a>
+              /
+              <li>
+                <a href="{{url_for('admin_ep.add_course')}}" class="active">Course Registration</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="container">
+          <div class="registration-form">
+            <form action="{{url_for('admin_ep.add_course')}}" method="POST" id="registration-form">
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+              <h2>Course Registration Form</h2>
+              <div class="show-messages" style="margin-bottom: 30px;">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <ul 
+                        style="background-color: rgb(248,215,218); border-radius: 10px; text-align: left; padding: 10px; margin-bottom: 30px;"
+                      >
+                        {% for msg in message %}
+                          <!-- category danger -->
+                          {% if category == "danger" %}
+                            <li>{{msg}}</li>
+                          {% endif %}
+                        {% endfor %}
+                      </ul>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+              </div>
+              <div class="form-group kursus">
+                <label for="nama-course">Course Name</label>
+                <input
+                  type="text"
+                  id="nama-course"
+                  name="course_name"
+                  required
+                />
+              </div>
+              <div class="form-group kursus">
+                <label for="course-id">Course ID</label>
+                <input
+                  type="text"
+                  id="course-id"
+                  name="course_id"
+                  required
+                />
+              </div>
+              <div class="form-group kursus">
+                <label for="course-sks">Course SKS</label>
+                <input
+                  type="number"
+                  id="course-sks"
+                  name="course_sks"
+                  required
+                />
+              </div>
+              <div class="form-group kursus">
+                <label for="semester">For semester</label>
+                <input
+                  type="number"
+                  id="semester"
+                  name="course_semester"
+                  required
+                />
+              </div>
+
+              <!-- pilih kelas -->
+              <div class="select-box">
+                <label for="options-container" id="class">Course Class</label>
+                <div class="options-container" id="options-container">
+                  {% for class in list_classes %}
+                    <div class="option">
+                      <input
+                        type="radio"
+                        class="radio"
+                        id="{{class.class_id}}"
+                        name="class_id"
+                        value="{{class.class_id}}"
+                        required
+                      />
+                      <label for="{{class.class_id}}">
+                        {{class.class_id}}
+                      </label>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="selected">Choose a Course Class</div>
+
+                <div class="search-box">
+                  <input type="text" placeholder="Search Class..." />
+                </div>
+              </div>
+              <!-- end -->
+              <!-- Select course day -->
+              <div class="form-group kursus">
+                <select name="course_day" id="day" required>
+                  {% for day in days_of_week %}
+                    <option value="{{day}}">
+                      {{day}}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <!-- End of select course day -->
+              <div class="form-group kursus">
+                <label for="start-course">Course Start</label>
+                <input
+                  type="time"
+                  id="start-course"
+                  name="time_start"
+                  required
+                  step="1"
+                />
+              </div>
+              <div class="form-group kursus">
+                <label for="end-course">Course End</label>
+                <input
+                  type="time"
+                  id="end-course"
+                  name="time_end"
+                  required
+                  step="1"
+                />
+              </div>
+              <!-- Select lecturer -->
+              <div class="form-group kursus">
+                <select name="lecturer_nip" id="lecturer" required>
+                  {% for lecturer in lecturers %}
+                    <option value="{{lecturer.user_id}}">
+                      {{lecturer.user_fullname}} ({{lecturer.user_id}})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <!-- End of select lecturer -->
+              <!-- Select course room -->
+              <div class="form-group kursus">
+                <select name="room_id" id="room" required>
+                  {% for room in rooms %}
+                    <option value="{{room.room_id}}">
+                      {{room.room_id}}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <!-- End of select course room -->
+              <div class="form-group kursus">
+                <label for="course-description">Course Description</label>
+                <input
+                  type="text"
+                  id="course-description"
+                  name="course_description"
+                />
+              </div>
+
+              <button type="submit" class="btn-register">Register Course</button>
+            </form>
+          </div>
+        </div>
+        <!-- End of Registration Form -->
+      </main>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      // DROPDOWN
+
+      const selected = document.querySelector(".selected");
+      const optionsContainer = document.querySelector(".options-container");
+      const searchBox = document.querySelector(".search-box input");
+      const label = document.querySelector("#class");
+
+      const optionsList = document.querySelectorAll(".option");
+
+      selected.addEventListener("click", () => {
+        optionsContainer.classList.toggle("active");
+
+        if (optionsContainer.classList.contains("active")) {
+          searchBox.style.display = "block";
+          searchBox.focus();
+          label.style.display = "block";
+        } else {
+          searchBox.style.display = "none";
+          searchBox.value = "";
+          filterList("");
+          const selectedRadio = document.querySelector(
+            "input[name='kelas']:checked"
+          );
+          if (selectedRadio) {
+            label.style.display = "block";
+          } else {
+            label.style.display = "none";
+          }
+        }
+      });
+
+      optionsList.forEach((o) => {
+        o.addEventListener("click", () => {
+          selected.innerHTML = o.querySelector("label").innerHTML;
+          const radioInput = o.querySelector("input[type=radio]");
+          radioInput.checked = true;
+          optionsContainer.classList.remove("active");
+          searchBox.style.display = "none";
+          searchBox.value = "";
+          filterList("");
+        });
+      });
+
+      searchBox.addEventListener("keyup", function (e) {
+        filterList(e.target.value);
+      });
+
+      const filterList = (searchTerm) => {
+        searchTerm = searchTerm.toLowerCase();
+        optionsList.forEach((option) => {
+          let label =
+            option.firstElementChild.nextElementSibling.innerText.toLowerCase();
+          if (label.indexOf(searchTerm) != -1) {
+            option.style.display = "block";
+          } else {
+            option.style.display = "none";
+          }
+        });
+      };
+
+      // END
+    </script>
+  </body>
+</html>

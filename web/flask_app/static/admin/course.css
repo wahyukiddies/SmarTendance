@@ -1,0 +1,456 @@
+.content main{
+    width: 100%;
+    padding: 36px 24px;
+    max-height: calc(100vh - 56px);
+}
+
+.content main .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 16px;
+    flex-wrap: wrap;
+}
+
+.content main .header .left h1{
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb{
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+}
+
+.content main .header .left .breadcrumb li{
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb li a{
+    color: var(--dark-grey);
+    pointer-events: none;
+}
+
+.content main .header .left .breadcrumb li a.active{
+    color: var(--primary);
+    pointer-events: none;
+}
+
+/* Dropdown select */
+.select-box {
+    position: relative;
+    display: flex;
+    max-width: 500px;
+    min-width: 300px;
+    flex-direction: column;
+    margin-bottom: 22px;
+    text-align: left;
+    margin-top: 40px; 
+  }
+
+.select-box label {
+    color: var(--dark);
+    margin: 5px 0;
+    cursor: pointer;
+}
+  
+.select-box select{
+    background-color: var(--dark-select);
+    border: 1px solid var(--dark-select);
+    height: 30px;
+    width: 68%;
+    border-radius: 8px;
+    color: var(--dark);
+}
+
+ 
+  /* end */
+
+.content main .bottom-data{
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 24px;
+    margin-top: 24px;
+    width: 100%;
+    color: var(--dark);
+    flex-direction: column;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.content main .bottom-data>div{
+    border-radius: 20px;
+    background: var(--light);
+    padding: 24px;
+    overflow-x: auto;
+}
+
+.content main .bottom-data .header{
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+    margin-bottom: 24px;
+}
+
+.content main .bottom-data .header h3{
+    margin-right: auto;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.content main .bottom-data .header .bx{
+    cursor: pointer;
+}
+
+.content main .bottom-data .orders{
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.content main .bottom-data .orders table{
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.content main .bottom-data .orders table th{
+    padding-bottom: 12px;
+    font-size: 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey);
+    
+}
+
+.content main .bottom-data .orders table td{
+    padding: 16px 7px;
+}
+
+.content main .bottom-data .orders table tr td:first-child{
+    text-align: left;
+    padding-left: 15px;
+}
+
+.content main .bottom-data .orders table td img{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.content main .bottom-data .orders table tbody tr{
+    
+    transition: all 0.3s ease;
+}
+
+.content main .bottom-data .orders table tbody tr:hover{
+    background: var(--grey);
+}
+
+.action{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.editButton, .deleteButton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+}  
+
+.editButton a, .deleteButton a{
+    color: #fff;
+    text-decoration: none;
+}
+
+.editButton i, .deleteButton i{
+    color: #fff;
+}
+
+#editButton i, #deleteButton i{
+    font-size: 0.5rem;
+    margin-right: 4px;
+}
+
+.content main .bottom-data .orders table tr td .status{
+    font-size: 15px;
+    padding: 6px 16px;
+    color: #fff;
+    border-radius: 20px;
+    font-weight: 700;
+    background-color: var(--success);
+}
+
+.content main .bottom-data .orders table tr td .status.completed{
+    background: var(--success);
+}
+
+.content main .bottom-data .orders table tr td .status.delete{
+    background: var(--danger);
+}
+
+.content main .bottom-data .orders table tr th, .content main .bottom-data .orders table tr td {
+    text-align: center;
+}
+
+.edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit .status{
+    display: flex;
+    align-items: center;
+}
+
+.edit .bx {
+    font-size: 1.5rem;
+    margin-right: 4px;
+}
+
+/* filter & pagination */
+
+.content main .bottom-data .header .filter-dropdown {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.content main .bottom-data .header .filter-dropdown select {
+    background: var(--grey);
+    border: none;
+    font-size: 17px;
+    color: var(--dark);
+    cursor: pointer;
+    width: 75px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.content .orders .header .filter-dropdown select {
+    display: none;
+}
+
+.content .orders .header .filter-dropdown.active select {
+    display: block;
+    margin-right: 5px;
+}
+
+.content .pagination {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    align-items: center;
+    justify-content: left;
+}
+
+.content .pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 5px;
+    color: var(--light-grey);
+    margin: 0 10px;
+}
+
+.content .pagination button:disabled {
+    color: var(--dark-grey);
+    cursor: not-allowed;
+}
+
+#prev-page, #next-page {
+    background-color: var(--grey);
+    padding: 5px;
+    border-radius: 4px;
+}
+
+ /* CSS for the confirmation modal */
+ .confirmation-modal-delete {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+  }
+  
+  .modal-content-delete {
+    background-color: var(--light);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px; 
+    width: 100%;
+    margin: auto;
+    color: var(--dark);
+  }
+  
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .confirmation-modal-delete button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  
+  #cancel-delete {
+    background-color: var(--danger);
+  }
+
+  #updateModalStudent {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background-color: var(--grey);
+    margin: 10% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+  }
+/* Lecturer */
+#updateModalCourse {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content-update {
+    background-color: var(--light);
+    margin: 10% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+  }
+  #titleUpdate {
+    color: var(--dark);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: rgb(68, 68, 68);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  #updateCourseForm {
+    display: grid;
+    gap: 10px;
+  }
+  
+.labelUpdate {
+    font-size: 16px;
+    color: var(--dark);
+    text-align: left;
+  }
+  
+  #updateCourseForm input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid var(--grey);
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 5px;
+    color: var(--dark);
+    background-color: var(--grey);
+  }
+  
+  button {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button.cancel {
+    background-color: #f44336;
+  }
+  
+  button.update:hover {
+    background-color: #45a049;
+  }
+  
+  /* Tambahkan CSS untuk mengatur tombol "Batal" */
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+  
+  /* Atur ulang warna tombol "Batal" dan "Update" */
+  button.cancel,
+  button.update {
+    width: 48%;
+  }
+  
+  button.cancel:hover,
+  button.update:hover {
+    opacity: 0.9;
+  }
+@media screen and (max-width: 768px) {
+    .content{
+        width: calc(100% - 60px);
+        left: 200px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .content main .bottom-data .header{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .orders table{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .reminders .task-list{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .orders table{
+        width: 100vw;
+    }
+
+}

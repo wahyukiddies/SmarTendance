@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="course.css" />
+    <link rel="stylesheet" href="SideMenu_Navbar.css" />
+    <title>Course</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="logo">
+        <img src="images/logo.png" alt="Logo SmarTandance" />
+        <div class="logo-name"><span>Smar</span>Tendance</div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+
+        <li>
+          <a href="#"><i class="bx bxs-door-open"></i>Class</a>
+        </li>
+        <li>
+          <a href="{{url_for('lecturer_ep.logs')}}"
+            ><i class="bx bx-data"></i>Attendance Recap</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('lecturer_ep.attendance_students')}}"
+            ><i class="bx bx-data"></i>Student Recap</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a href="#" class="logout" id="logout-button">
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>Apakah Anda yakin ingin logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Ya</button>
+                <button id="cancel-logout">Tidak</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img src="images/profile_logo.png" />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Course</h1>
+            <ul class="breadcrumb">
+              <li><a href="" class="active">Course</a></li>
+              /
+            </ul>
+          </div>
+        </div>
+
+        <div class="select-box">
+          <label for="options-container" id="class">Kelas</label>
+          <div class="options-container" id="options-container">
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 1A"
+                name="kelas"
+                value="TMJ 1A"
+              />
+              <label for="TMJ 1A">TMJ 1A</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 1B"
+                name="kelas"
+                value="TMJ 1B"
+              />
+              <label for="TMJ 1B">TMJ 1B</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMD 1A"
+                name="kelas"
+                value="TMD 1A"
+              />
+              <label for="TMD 1A">TMD 1A</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMD 1B"
+                name="kelas"
+                value="TMD 1B"
+              />
+              <label for="TMD 1B">TMD 1B</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TKJ 1"
+                value="TKJ 1"
+                name="kelas"
+              />
+              <label for="TKJ 1">TKJ 1</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 3A"
+                value="TMJ 3A"
+                name="kelas"
+              />
+              <label for="TMJ 3A">TMJ 3A</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 3B"
+                value="TMJ 3B"
+                name="kelas"
+              />
+              <label for="TMJ 3B">TMJ 3B</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 5"
+                value="TMJ 5"
+                name="kelas"
+              />
+              <label for="TMJ 5">TMJ 5</label>
+            </div>
+
+            <div class="option">
+              <input
+                type="radio"
+                class="radio"
+                id="TMJ 7A"
+                value="TMJ 7A"
+                name="kelas"
+              />
+              <label for="TMJ 7A">TMJ 7A</label>
+            </div>
+          </div>
+
+          <div class="selected">Pilih Kelas</div>
+
+          <div class="search-box">
+            <input type="text" placeholder="Cari Kelas..." />
+          </div>
+        </div>
+
+        <!-- Tabel Course Terdaftar -->
+        <div class="bottom-data">
+          <div class="orders">
+            <div class="header">
+              <i class="bx bx-calendar"></i>
+              <h3 id="tanggal"></h3>
+              <div class="filter-dropdown">
+                <select id="data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter"></i>
+              </div>
+              <input
+                type="search"
+                placeholder="Search..."
+                class="search-input"
+              />
+              <button class="search-btn" type="submit">
+                <i class="bx bx-search"></i>
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Mata Kuliah</th>
+                  <th>Kode</th>
+                  <th>Dosen Pengampu</th>
+                  <th>Jumlah Mahasiswa</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sistem Embedded</td>
+                  <td>D82HF</td>
+                  <td>Prihatin Oktivasari</td>
+                  <td>29</td>
+                  <td class="edit">
+                    <a href="#" class="status completed"
+                      ><i class="bx bxs-edit ed"></i>edit</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pemrograman Web</td>
+                  <td>D82HF</td>
+                  <td>Maria Agustin</td>
+                  <td>29</td>
+                  <td class="edit">
+                    <a href="#" class="status completed"
+                      ><i class="bx bxs-edit ed"></i>edit</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pemrograman Berorientasi Objek</td>
+                  <td>D82HF</td>
+                  <td>Ariawan Andi Suhandana</td>
+                  <td>29</td>
+                  <td class="edit">
+                    <a href="#" class="status completed"
+                      ><i class="bx bxs-edit ed"></i>edit</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Rekayasa Perangkat Lunak</td>
+                  <td>D82HF</td>
+                  <td>Susana Dwi Yulianti</td>
+                  <td>29</td>
+                  <td class="edit">
+                    <a href="#" class="status completed"
+                      ><i class="bx bxs-edit ed"></i>edit</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Keamanan Komputer</td>
+                  <td>D82HF</td>
+                  <td>Defiana Arnaldy</td>
+                  <td>29</td>
+                  <td class="edit">
+                    <a href="#" class="status completed"
+                      ><i class="bx bxs-edit ed"></i>edit</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="current-page">Page 1</span>
+              <button id="next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      const searchButtons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn"
+      );
+      const searchButtonIcons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn .bx"
+      );
+      const searchInputs = document.querySelectorAll(
+        ".bottom-data .orders .header .search-input"
+      );
+
+      searchButtons.forEach((searchButton, index) => {
+        const searchButtonIcon = searchButtonIcons[index];
+        const searchInput = searchInputs[index];
+
+        searchButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          searchInput.classList.toggle("show");
+
+          if (searchInput.classList.contains("show")) {
+            searchButtonIcon.classList.replace("bx-search", "bx-x");
+            searchInput.focus(); // Fokuskan input textfield setelah ditampilkan
+          } else {
+            searchButtonIcon.classList.replace("bx-x", "bx-search");
+          }
+        });
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+
+        // Fungsi untuk memperbarui waktu secara berkala
+        function updateClock() {
+          const tanggalElement = document.getElementById("tanggal");
+          const currentTime = new Date();
+          const hari = currentTime.toLocaleDateString(undefined, {
+            weekday: "long",
+          });
+          const tanggal = currentTime.getDate();
+          const bulan = currentTime.toLocaleDateString(undefined, {
+            month: "long",
+          });
+          const tahun = currentTime.getFullYear();
+          const jam = currentTime.getHours().toString().padStart(2, "0");
+          const menit = currentTime.getMinutes().toString().padStart(2, "0");
+          const detik = currentTime.getSeconds().toString().padStart(2, "0");
+
+          // Format waktu
+          const formattedTime = `${hari}, ${tanggal} ${bulan} ${tahun} (${jam}:${menit}:${detik})`;
+
+          // Tampilkan waktu dalam elemen dengan ID "tanggal"
+          tanggalElement.textContent = formattedTime;
+        }
+
+        // Memperbarui waktu setiap detik
+        setInterval(updateClock, 1000);
+
+        // Memanggil fungsi updateClock untuk menampilkan waktu saat halaman dimuat
+        updateClock();
+      });
+
+      // dropdown radio
+      const selected = document.querySelector(".selected");
+      const optionsContainer = document.querySelector(".options-container");
+      const searchBox = document.querySelector(".search-box input");
+      const label = document.querySelector("#class");
+
+      const optionsList = document.querySelectorAll(".option");
+
+      selected.addEventListener("click", () => {
+        optionsContainer.classList.toggle("active");
+
+        if (optionsContainer.classList.contains("active")) {
+          searchBox.style.display = "block"; // Tampilkan input search saat options aktif
+          searchBox.focus();
+          label.style.display = "block";
+        } else {
+          searchBox.style.display = "none"; // Sembunyikan input search saat options tidak aktif
+          searchBox.value = ""; // Hapus nilai input search
+          filterList(""); // Hapus filter
+          const selectedRadio = document.querySelector(
+            "input[name='kelas']:checked"
+          );
+          if (selectedRadio) {
+            label.style.display = "block";
+          } else {
+            label.style.display = "none";
+          }
+        }
+      });
+
+      optionsList.forEach((o) => {
+        o.addEventListener("click", () => {
+          selected.innerHTML = o.querySelector("label").innerHTML; // Mengganti teks yang ditampilkan di dropdown
+          const radioInput = o.querySelector("input[type=radio]"); // Mendapatkan elemen radio terkait
+          radioInput.checked = true; // Menandai elemen radio sebagai terpilih
+          optionsContainer.classList.remove("active");
+          searchBox.style.display = "none";
+          searchBox.value = "";
+          filterList("");
+        });
+      });
+
+      searchBox.addEventListener("keyup", function (e) {
+        filterList(e.target.value);
+      });
+
+      const filterList = (searchTerm) => {
+        searchTerm = searchTerm.toLowerCase();
+        optionsList.forEach((option) => {
+          let label =
+            option.firstElementChild.nextElementSibling.innerText.toLowerCase();
+          if (label.indexOf(searchTerm) != -1) {
+            option.style.display = "block";
+          } else {
+            option.style.display = "none";
+          }
+        });
+      };
+
+      // filter & pagination
+      const filterIcon = document.querySelector(".header .filter-dropdown i");
+      const filterDropdown = document.querySelector(".header .filter-dropdown");
+      const dataFilterSelect = document.getElementById("data-filter");
+      const tableRows = document.querySelectorAll(
+        ".bottom-data .orders table tbody tr"
+      );
+      const prevPageButton = document.getElementById("prev-page");
+      const nextPageButton = document.getElementById("next-page");
+      const currentPageSpan = document.getElementById("current-page");
+
+      let currentPage = 1;
+      let itemsPerPage = parseInt(dataFilterSelect.value);
+
+      function updatePagination() {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        currentPageSpan.textContent = `Page ${currentPage}`;
+
+        if (currentPage === 1) {
+          prevPageButton.disabled = true;
+        } else {
+          prevPageButton.disabled = false;
+        }
+
+        if (currentPage === totalPages) {
+          nextPageButton.disabled = true;
+        } else {
+          nextPageButton.disabled = false;
+        }
+
+        tableRows.forEach((row, index) => {
+          if (
+            index >= (currentPage - 1) * itemsPerPage &&
+            index < currentPage * itemsPerPage
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      filterIcon.addEventListener("click", function () {
+        filterDropdown.classList.toggle("active");
+      });
+
+      dataFilterSelect.addEventListener("change", function () {
+        itemsPerPage = parseInt(dataFilterSelect.value);
+        currentPage = 1;
+        updatePagination();
+      });
+
+      prevPageButton.addEventListener("click", function () {
+        if (currentPage > 1) {
+          currentPage--;
+          updatePagination();
+        }
+      });
+
+      nextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          updatePagination();
+        }
+      });
+
+      updatePagination();
+    </script>
+  </body>
+</html>

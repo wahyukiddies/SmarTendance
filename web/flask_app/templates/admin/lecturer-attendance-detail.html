@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/attendance-detail.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}" />
+    <title>Admin | Detail {{lecturer.user_fullname}}</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img src="{{url_for('static', filename='images/logo.png')}}" alt="Logo SmarTandance" />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"><i class="bx bxs-dashboard"></i>Dashboard</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"><i class="bx bxs-graduation"></i>Course</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.add')}}"><i class="bx bx-group"></i>Registration</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"><i class="bx bxs-door-open"></i>Class</a>
+        </li>
+        <li class="active">
+          <a href="{{url_for('admin_ep.view_attendance')}}"><i class="bx bx-data"></i>Attendance Logs</a>
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a href="#" class="logout" id="logout-button" data-logout-url="{{url_for('user_ep.logout')}}">
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none;">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img src="{{url_for('static', filename='images/profile_logo.png')}}" />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Detail</h1>
+            <ul class="breadcrumb">
+              <a href="{{url_for('admin_ep.view_attendance')}}">
+                <li>Attendance Logs</li>
+              </a>
+              /
+              <a href="">
+                <li>Detail</li>
+              </a>
+              /
+              <li>
+                <a href="" class="active">{{lecturer.user_fullname}}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tabel Course Terdaftar -->
+        <div class="bottom-data">
+          <div class="orders">
+            <div class="header">
+              <i class="bx bx-data"></i>
+              <h3>{{lecturer.user_fullname}} Attendance Logs</h3>
+              <div class="filter-dropdown">
+                <select id="data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter"></i>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>NIP</th>
+                  <th>Name</th>
+                  <th>Course</th>
+                  <th>Room</th>
+                  <th>Time In</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- The table data will automatically get injected from JS after request to the server is done. -->
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="current-page">Page 1</span>
+              <button id="next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+              <a href="" class="status ekspor" id="export-btn">
+                <i class="bx bx-export"></i>Export
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      searchParam = new URLSearchParams(window.location.search);
+      const lecturerNIP = searchParam.get("nip");
+      const exportURL = `{{url_for('admin_ep.export_attendance', selected_role='LECTURER')}}?nip=${lecturerNIP}`;
+      const apiURL = `{{url_for('admin_ep.get_attendance_detail', selected_role='LECTURER')}}?nip=${lecturerNIP}`;
+      
+      if (searchParam.has("nip") && lecturerNIP.length === 18) {
+        getLecturerAttendanceData();
+        exportLecturerAttendanceData();
+      }
+
+      // Function to change the href link of export-btn
+      function exportLecturerAttendanceData() {
+        const exportBtn = document.getElementById("export-btn");
+        if (lecturerNIP) {
+          exportBtn.href = exportURL;
+        }
+        else {
+          exportBtn.href = "#";
+        }
+      }
+
+      // Function to populate table body with data that is fetched from the flask
+      function populateTable(lecturerAttendanceData) {
+        const tbody = document.querySelector(
+          ".bottom-data .orders table tbody"
+        );
+        tbody.innerHTML = "";
+
+        if (lecturerAttendanceData.length === 0) {
+          const newRow = document.createElement("tr"); 
+          newRow.innerHTML = `<td colspan="6" style="text-align: center;">No attendance found</td>`;
+          tbody.appendChild(newRow);
+        }
+        else {
+          lecturerAttendanceData.forEach((rowData) => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+              <td>${rowData.nip}</td>
+              <td>${rowData.name}</td>
+              <td>${rowData.course}</td>
+              <td>${rowData.room}</td>
+              <td>${rowData.time_in}</td>
+              <td>${rowData.status}</td>
+            `;
+            tbody.appendChild(newRow);
+          });
+        }
+      }
+
+      // Function to fetch the lecturer attendance logs detail from the flask by their nip
+      function getLecturerAttendanceData() {
+        if (lecturerNIP) {
+          fetch(apiURL)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              populateTable(data.attendance_detail);
+            })
+            .catch((error) => {
+              console.error(error);
+            })
+        }
+      }
+
+      const searchButtons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn"
+      );
+      const searchButtonIcons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn .bx"
+      );
+      const searchInputs = document.querySelectorAll(
+        ".bottom-data .orders .header .search-input"
+      );
+
+      searchButtons.forEach((searchButton, index) => {
+        const searchButtonIcon = searchButtonIcons[index];
+        const searchInput = searchInputs[index];
+
+        searchButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          searchInput.classList.toggle("show");
+
+          if (searchInput.classList.contains("show")) {
+            searchButtonIcon.classList.replace("bx-search", "bx-x");
+            searchInput.focus(); // Fokuskan input textfield setelah ditampilkan
+          } else {
+            searchButtonIcon.classList.replace("bx-x", "bx-search");
+          }
+        });
+      });
+
+      // filter & pagination
+      const filterIcon = document.querySelector(".header .filter-dropdown i");
+      const filterDropdown = document.querySelector(".header .filter-dropdown");
+      const dataFilterSelect = document.getElementById("data-filter");
+      const tableRows = document.querySelectorAll(
+        ".bottom-data .orders table tbody tr"
+      );
+      const prevPageButton = document.getElementById("prev-page");
+      const nextPageButton = document.getElementById("next-page");
+      const currentPageSpan = document.getElementById("current-page");
+
+      let currentPage = 1;
+      let itemsPerPage = parseInt(dataFilterSelect.value);
+
+      function updatePagination() {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        currentPageSpan.textContent = `Page ${currentPage}`;
+
+        if (currentPage === 1) {
+          prevPageButton.disabled = true;
+        } else {
+          prevPageButton.disabled = false;
+        }
+
+        if (currentPage === totalPages) {
+          nextPageButton.disabled = true;
+        } else {
+          nextPageButton.disabled = false;
+        }
+
+        tableRows.forEach((row, index) => {
+          if (
+            index >= (currentPage - 1) * itemsPerPage &&
+            index < currentPage * itemsPerPage
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      filterIcon.addEventListener("click", function () {
+        filterDropdown.classList.toggle("active");
+      });
+
+      dataFilterSelect.addEventListener("change", function () {
+        itemsPerPage = parseInt(dataFilterSelect.value);
+        currentPage = 1;
+        updatePagination();
+      });
+
+      prevPageButton.addEventListener("click", function () {
+        if (currentPage > 1) {
+          currentPage--;
+          updatePagination();
+        }
+      });
+
+      nextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          updatePagination();
+        }
+      });
+
+      updatePagination();
+    </script>
+  </body>
+</html>

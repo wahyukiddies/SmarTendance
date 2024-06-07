@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/rekap_absen.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}" />
+    <title>Admin | Attendance Logs</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img src="{{url_for('static', filename='images/logo.png')}}" alt="Logo SmarTandance" />
+        <div class="logo-name"><span>Smartendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"><i class="bx bxs-dashboard"></i>Dashboard</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"><i class="bx bxs-graduation"></i>Course</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.add')}}"><i class="bx bx-group"></i>Registration</a>
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"><i class="bx bxs-door-open"></i>Class</a>
+        </li>
+        <li class="active">
+          <a href="{{url_for('admin_ep.view_attendance')}}"><i class="bx bx-data"></i>Attendance Logs</a>
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a href="#" class="logout" id="logout-button" data-logout-url="{{url_for('user_ep.logout')}}">
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none;">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img src="{{url_for('static', filename='images/profile_logo.png')}}" />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Attendance Logs</h1>
+            <ul class="breadcrumb">
+              <li>
+                <a href="{{url_for('admin_ep.view_attendance')}}" class="active">Attendance Logs</a>
+              </li>
+              /
+            </ul>
+          </div>
+        </div>
+
+        <!-- Select user role -->
+        <div class="select-box">
+          <!-- Role selection -->
+          <label for="select-role">Choose a user role</label>
+          <select name="role" id="select-role">
+            <option value="" disabled selected hidden>User role</option> <!-- Default option is set to be empty -->
+              {% for role in roles %}
+                <option value="{{role}}">{{role}}</option>
+              {% endfor %}
+            </option>
+          </select>
+          <br />
+          <!-- End of role selection -->
+
+          <!-- Course selection -->
+          <label for="select-course">Select a user course</label>
+          <select name="course" id="select-course">
+            <option value="" disabled selected hidden>User course</option> <!-- Default option is set to be empty -->
+            {% for course in courses %}
+              <option value="{{course.course_id}}">{{course.course_name}}</option>
+            {% endfor %}
+          </select>
+          <!-- End of selection course -->
+        </div>
+
+        <!-- Tabel Course Terdaftar -->
+        <div class="bottom-data">
+          <!-- coba -->
+          <div class="orders" id="attendanceLogsContainer" style="display: none;">
+            <div class="header">
+              <i class="bx bx-data"></i>
+              <h3>Attendance Logs</h3>
+              <div class="filter-dropdown">
+                <select id="data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter"></i>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Room</th>
+                <th>Time In</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </thead>
+              <tbody>
+                <!-- The table data will automatically get injected from JS after request to the server is done. -->
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="current-page">Page 1</span>
+              <button id="next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+              <!-- export button -->
+              <a href="" class="status ekspor" id="export-btn">
+                <i class="bx bx-export"></i>Export
+              </a>
+              <!-- end of export button -->
+            </div>
+          </div>
+          <!-- end -->
+        </div>
+      </main>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      // Function to change the href link of export-btn
+      function exportAttendanceData(selectedRole, selectedCourse) {
+        const exportBtn = document.getElementById("export-btn");
+        if (selectedRole === "STUDENT") {
+          exportBtn.href = `{{url_for('admin_ep.export_attendance', selected_role='STUDENT')}}`;
+          if (selectedCourse) {
+            exportBtn.href += `?course_id=${selectedCourse}`;
+          }
+        }
+        else if (selectedRole === "LECTURER") {
+          exportBtn.href = `{{url_for('admin_ep.export_attendance', selected_role='LECTURER')}}`;
+          if (selectedCourse) {
+            exportBtn.href += `?course_id=${selectedCourse}`;
+          }
+        }
+        else {
+          exportBtn.href = "#";
+        }
+      }
+
+      function getAttendanceData(selectedRole, selectedCourse) {
+        const attendanceLogsContainer = document.getElementById('attendanceLogsContainer');
+
+        // If admin select role and course, then fetch the data with course_id query parameter
+        if (selectedRole && selectedCourse) {
+          const apiURL = `/admin/attendance/${selectedRole}/get?course_id=${selectedCourse}`;
+          fetch(apiURL)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Panggil fungsi untuk mengisi tabel dengan data
+              populateTable(data.attendance, selectedRole);
+              attendanceLogsContainer.style.display = 'block'; // Show attendance logs container
+            })
+            .catch((error) => {
+              console.error(error);
+              attendanceLogsContainer.style.display = 'none'; // Hide attendance logs container on error
+            });
+        }
+        // If the user only select role, then fetch the data without course_id query parameter
+        else {
+          const apiURL = `/admin/attendance/${selectedRole}/get`;
+          fetch(apiURL)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Panggil fungsi untuk mengisi tabel dengan data
+              populateTable(data.attendance, selectedRole);
+              attendanceLogsContainer.style.display = 'block'; // Show attendance logs container
+            })
+            .catch((error) => {
+              console.error(error);
+              attendanceLogsContainer.style.display = 'none'; // Hide attendance logs container on error
+            });
+        }
+      }
+    
+      // Fungsi untuk mengisi tabel dengan data absensi
+      function populateTable(attendanceData, selectedRole) {
+        const tableBody = document.querySelector(
+          ".bottom-data .orders table tbody"
+        );
+        tableBody.innerHTML = ""; // Kosongkan isi tabel
+
+        if (attendanceData.length === 0) {
+          const newRow = document.createElement("tr");
+          const rowData = `<td colspan="6" style="text-align: center;">No attendance logs found</td>`;
+          newRow.innerHTML += rowData;
+          tableBody.appendChild(newRow);
+        }
+        else {
+          attendanceData.forEach((rowData) => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+              <td>${rowData.name}</td>
+              <td>${rowData.course}</td>
+              <td>${rowData.room}</td>
+              <td>${rowData.time_in}</td>
+              <td>${rowData.status}</td>
+            `;
+            if (selectedRole === 'STUDENT') {
+              newRow.innerHTML += `
+                <td class="edit">
+                  <a href="{{url_for('admin_ep.view_attendance_detail', selected_role='STUDENT')}}?nim=${rowData.nim}" class="status view">
+                    <i class="bx bx-detail"></i>Detail
+                  </a>
+                </td>
+              `;
+            } else if (selectedRole === 'LECTURER') {
+              newRow.innerHTML += `
+                <td class="edit">
+                  <a href="{{url_for('admin_ep.view_attendance_detail', selected_role='LECTURER')}}?nip=${rowData.nip}" class="status view">
+                    <i class="bx bx-detail"></i>Detail
+                  </a>
+                </td>
+              `;
+            }
+            tableBody.appendChild(newRow);
+          });
+        }
+      }
+
+      const searchButtons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn"
+      );
+      const searchButtonIcons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn .bx"
+      );
+      const searchInputs = document.querySelectorAll(
+        ".bottom-data .orders .header .search-input"
+      );
+
+      searchButtons.forEach((searchButton, index) => {
+        const searchButtonIcon = searchButtonIcons[index];
+        const searchInput = searchInputs[index];
+
+        searchButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          searchInput.classList.toggle("show");
+
+          if (searchInput.classList.contains("show")) {
+            searchButtonIcon.classList.replace("bx-search", "bx-x");
+            searchInput.focus(); // Fokuskan input textfield setelah ditampilkan
+          } else {
+            searchButtonIcon.classList.replace("bx-x", "bx-search");
+          }
+        });
+      });
+
+      // Function to handle change event of input radio (role)
+      function handleSelectionChange() {
+        const selectedRole = document.getElementById("select-role").value;
+        const selectedCourse = document.getElementById("select-course").value;
+      
+        // Fetch the attendance logs data
+        getAttendanceData(selectedRole, selectedCourse);
+      
+        // Change the href link of export-btn
+        exportAttendanceData(selectedRole, selectedCourse);
+      }
+      
+      function showAttendanceData() {
+        const inputRole = document.getElementById("select-role");
+        inputRole.addEventListener("change", handleSelectionChange);
+      
+        const inputCourse = document.getElementById("select-course");
+        inputCourse.addEventListener("change", handleSelectionChange);
+      }
+      
+      showAttendanceData();
+
+      // filter & pagination
+      const filterIcon = document.querySelector(".header .filter-dropdown i");
+      const filterDropdown = document.querySelector(".header .filter-dropdown");
+      const dataFilterSelect = document.getElementById("data-filter");
+      const tableRows = document.querySelectorAll(
+        ".bottom-data .orders table tbody tr"
+      );
+      const prevPageButton = document.getElementById("prev-page");
+      const nextPageButton = document.getElementById("next-page");
+      const currentPageSpan = document.getElementById("current-page");
+
+      let currentPage = 1;
+      let itemsPerPage = parseInt(dataFilterSelect.value);
+
+      function updatePagination() {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        currentPageSpan.textContent = `Page ${currentPage}`;
+
+        if (currentPage === 1) {
+          prevPageButton.disabled = true;
+        } else {
+          prevPageButton.disabled = false;
+        }
+
+        if (currentPage === totalPages) {
+          nextPageButton.disabled = true;
+        } else {
+          nextPageButton.disabled = false;
+        }
+
+        tableRows.forEach((row, index) => {
+          if (
+            index >= (currentPage - 1) * itemsPerPage &&
+            index < currentPage * itemsPerPage
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      filterIcon.addEventListener("click", function () {
+        filterDropdown.classList.toggle("active");
+      });
+
+      dataFilterSelect.addEventListener("change", function () {
+        itemsPerPage = parseInt(dataFilterSelect.value);
+        currentPage = 1;
+        updatePagination();
+      });
+
+      prevPageButton.addEventListener("click", function () {
+        if (currentPage > 1) {
+          currentPage--;
+          updatePagination();
+        }
+      });
+
+      nextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(tableRows.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          updatePagination();
+        }
+      });
+
+      updatePagination();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/regis-form.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}"
+    />
+    <title>Admin | Lecturer Registration</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"
+            ><i class="bx bxs-graduation"></i>Course</a
+          >
+        </li>
+        <li class="active">
+          <a href="{{url_for('admin_ep.add')}}"
+            ><i class="bx bx-group"></i>Registration</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"
+            ><i class="bx bxs-door-open"></i>Class</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.view_attendance')}}"
+            ><i class="bx bx-data"></i>Attendance Logs</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"></label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+      <!-- End of Navbar -->
+
+      <!-- Main Content -->
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Lecturer Account Registration</h1>
+            <ul class="breadcrumb">
+              <a href="{{url_for('admin_ep.add')}}"><li>Registration</li></a>
+              /
+              <li>
+                <a href="{{url_for('admin_ep.add_lecturer')}}" class="active">
+                  Lecturer Account Registration
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="container">
+          <div class="registration-form">
+            <form
+              action="{{url_for('admin_ep.add_lecturer')}}"
+              method="POST"
+              id="registration-form"
+            >
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+              <h2>Lecturer Registration Form</h2>
+              <div class="show-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <ul
+                  style="
+                    background-color: rgb(248, 215, 218);
+                    border-radius: 10px;
+                    text-align: left;
+                    padding: 10px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  {% for msg in message %} {% if category == "danger" %}
+                  <li>{{msg}}</li>
+                  {% endif %} {% endfor %}
+                </ul>
+                {% endfor %} {% endif %} {% endwith %}
+              </div>
+              <div class="form-group">
+                <label for="nama">Lecturer Name</label>
+                <input type="text" id="nama" name="lecturer_name" required />
+              </div>
+              <div class="form-group">
+                <label for="nip">Lecturer NIP</label>
+                <input type="text" id="nip" name="lecturer_nip" required />
+              </div>
+              <!-- DROPDOWN MAJOR LIST -->
+              <div class="form-group">
+                <select name="lecturer_major" id="major" required>
+                  {% for major in major_list %}
+                  <option value="{{major}}">{{major}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="password">Lecturer Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="lecturer_pw"
+                  required
+                />
+                <span
+                  class="show-password"
+                  onclick="togglePasswordVisibility('password')"
+                  ><ion-icon name="eye-off-outline" id="hide"></ion-icon
+                ></span>
+              </div>
+              <div class="form-group">
+                <label for="confirm-pass">Confirm Lecturer Password</label>
+                <input
+                  type="password"
+                  id="confirm-pass"
+                  name="lecturer_confirm_pw"
+                  required
+                />
+                <span
+                  class="show-password"
+                  onclick="togglePasswordVisibility('confirm-pass')"
+                  ><ion-icon name="eye-off-outline" id="hide"></ion-icon
+                ></span>
+              </div>
+              <div class="form-group">
+                <label for="email">Lecturer Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="lecturer_email_address"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="home-address">Lecturer Home Address</label>
+                <input
+                  type="text"
+                  id="home-address"
+                  name="lecturer_home_address"
+                />
+              </div>
+              <div class="form-uid" id="uid-btn">
+                <button type="button" id="show-uid-popup">
+                  <i class="bx bx-rfid"></i><span>Scan lecturer ID Card</span>
+                </button>
+              </div>
+              <div class="form-group">
+                <label for="uid" id="label-uid">Lecturer Card UID</label>
+                <input
+                  type="text"
+                  id="uid"
+                  placeholder="Lecturer Card UID"
+                  name="lecturer_uid"
+                  readonly
+                  required
+                />
+              </div>
+              <div class="delete">
+                <button type="button">
+                  <i class="bx bxs-trash"></i>
+                  <span>Delete Lecturer Card UID</span>
+                </button>
+              </div>
+              <button type="submit" class="btn-register">
+                Register Lecturer
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- End of Registration Form -->
+      </main>
+    </div>
+    <div class="popup" id="uid-popup">
+      <div class="popup-container">
+        <h2>Lecturer ID Card Registration</h2>
+        <div id="wifi-loader">
+          <svg class="circle-outer" viewBox="0 0 86 86">
+            <circle class="back" cx="43" cy="43" r="40"></circle>
+            <circle class="front" cx="43" cy="43" r="40"></circle>
+            <circle class="new" cx="43" cy="43" r="40"></circle>
+          </svg>
+          <svg class="circle-middle" viewBox="0 0 60 60">
+            <circle class="back" cx="30" cy="30" r="27"></circle>
+            <circle class="front" cx="30" cy="30" r="27"></circle>
+          </svg>
+          <svg class="circle-inner" viewBox="0 0 34 34">
+            <circle class="back" cx="17" cy="17" r="14"></circle>
+            <circle class="front" cx="17" cy="17" r="14"></circle>
+          </svg>
+          <div class="text" data-text="Scanning"></div>
+        </div>
+        <div class="complete-mark">
+          <svg class="icon-success" viewBox="0 0 76 76">
+            <circle cx="38" cy="38" r="36" fill="#66bb6a"></circle>
+            <path
+              fill="none"
+              stroke="#FFFFFF"
+              stroke-width="7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-dasharray="56"
+              stroke-dashoffset="56"
+              d="M17.7,40.9l10.9,10.9l28.7-28.7"
+            ></path>
+          </svg>
+        </div>
+        <div class="scan-success">Lecturer Card UID Successfully Read</div>
+        <input
+          type="text"
+          id="uid-input"
+          placeholder="Please tap the Lecturer id card"
+        />
+        <div class="popup-button" align-self="flex-end">
+          <button id="close-popup" class="cancel">Cancel</button>
+          <button id="register-uid-button">Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+      const formGroups = document.querySelectorAll(".form-group input");
+
+      formGroups.forEach((input) => {
+        input.addEventListener("focus", (event) => {
+          const label = event.target.previousElementSibling;
+          label.classList.add("active");
+        });
+
+        input.addEventListener("blur", (event) => {
+          if (event.target.value === "") {
+            const label = event.target.previousElementSibling;
+            label.classList.remove("active");
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("password");
+        const eyeIcon = document.querySelector(".show-password ion-icon");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.name = "eye-off";
+        } else {
+          passwordInput.type = "password";
+          eyeIcon.name = "eye";
+        }
+      }
+
+      function togglePasswordVisibility(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.querySelector(
+          `#${inputId} + .show-password ion-icon`
+        );
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.name = "eye";
+        } else {
+          passwordInput.type = "password";
+          eyeIcon.name = "eye-off-outline";
+        }
+      }
+
+      const showUidButton = document.getElementById("show-uid-popup");
+      const popup = document.querySelector(".popup");
+      const closePopupButton = document.getElementById("close-popup");
+      const uidInput = document.getElementById("uid");
+      const registerUidButton = document.getElementById("register-uid-button");
+      const labelUid = document.getElementById("label-uid");
+      const uidInputField = document.getElementById("uid-input");
+
+      showUidButton.addEventListener("click", () => {
+        popup.style.display = "flex";
+      });
+
+      closePopupButton.addEventListener("click", () => {
+        popup.style.display = "none";
+        uidInputField.value = ""; // Reset value input UID
+        wifiLoader.style.display = "flex";
+        completeMark.style.display = "none";
+        scanSuccess.style.display = "none";
+        completeMark.classList.remove("success");
+      });
+
+      labelUid.style.display = "none";
+
+      registerUidButton.addEventListener("click", () => {
+        const uidInputValue = uidInputField.value;
+        uidInputField.value = "";
+        wifiLoader.style.display = "flex";
+        completeMark.style.display = "none";
+        scanSuccess.style.display = "none";
+        completeMark.classList.remove("success");
+
+        if (uidInputValue.trim() === "") {
+          const uidInputVal = uidInput.value;
+          // Set value untuk input dengan id "uid"
+          uidInput.value = uidInputValue;
+
+          // const uidHiddenVal = hiddenInput.value;
+          if (uidInputVal.trim() !== "") {
+            uidInput.value = uidInputValue;
+          }
+        } else {
+          uidInput.value = uidInputValue;
+        }
+
+        if (uidInputValue) {
+          labelUid.style.display = "block";
+        } else {
+          labelUid.style.display = "none";
+        }
+
+        popup.style.display = "none";
+      });
+
+      // cek konfirmasi password
+
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirm-pass");
+
+      confirmPasswordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password === confirmPassword) {
+          confirmPasswordInput.setCustomValidity(""); // Password cocok, hapus pesan kesalahan
+        } else {
+          confirmPasswordInput.setCustomValidity(
+            "Password confirmation not match"
+          ); // Password tidak cocok, atur pesan kesalahan
+        }
+      });
+    </script>
+
+    <!-- MQTT JS Library -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+    <!-- Handle MQTT Connection -->
+    <script type="application/javascript">
+      // Create MQTT conenction
+      const host = "ws://broker.emqx.io:8083/mqtt";
+      const clientId = "js_mqtt_client";
+      const subTopic = "SmarTendance/ESP8266/Register";
+      const inputUID = document.getElementById("uid-input");
+      const options = {
+        keepalive: 60,
+        clientId: clientId,
+        protocolId: "MQTT",
+        protocolVersion: 4,
+        clean: true,
+        reconnectPeriod: 1000,
+        connectTimeout: 30 * 1000,
+        will: {
+          topic: "WillMsg",
+          payload: "Connection Closed abnormally..!",
+          qos: 0,
+          retain: false,
+        },
+      };
+      console.log("Connecting mqtt client");
+
+      // Create MQTT Client
+      const mqttClient = mqtt.connect(host, options);
+
+      // Get MQTT message
+      mqttClient.on("connect", () => {
+        // Print the message to the console
+        console.log(`Client connected: ${clientId}`);
+        mqttClient.subscribe(subTopic, { qos: 0 });
+      });
+      mqttClient.on("message", (topic, msg, packet) => {
+        console.log(`Received Message: ${msg.toString()} On topic: ${topic}`);
+
+        inputUID.value = msg.toString();
+        console.log(inputUID.value);
+        if (inputUID.value) {
+          wifiLoader.style.display = "none";
+          completeMark.style.display = "block";
+          scanSuccess.style.display = "block";
+          completeMark.classList.add("success");
+          console.log(inputUID.value);
+        } else {
+          wifiLoader.style.display = "flex";
+          completeMark.style.display = "none";
+          scanSuccess.style.display = "none";
+          completeMark.classList.remove("success");
+        }
+      });
+      mqttClient.on("error", (err) => {
+        console.log("Connection error: ", err);
+        mqttClient.end();
+      });
+      mqttClient.on("reconnect", () => {
+        console.log("Reconnecting...");
+      });
+
+      const wifiLoader = document.getElementById("wifi-loader");
+      const completeMark = document.querySelector(".complete-mark");
+      const scanSuccess = document.querySelector(".scan-success");
+
+      const deleteUID = document.querySelector(".delete button");
+
+      deleteUID.addEventListener("click", () => {
+        uidInput.value = "";
+        labelUid.style.display = "none";
+      });
+    </script>
+  </body>
+</html>

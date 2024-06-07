@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/style.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}"
+    />
+    <title>{{admin.user_fullname}} | Dashboard</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li class="active">
+          <a href="{{url_for('user_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"
+            ><i class="bx bxs-graduation"></i>Course</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.add')}}"
+            ><i class="bx bx-group"></i>Registration</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"
+            ><i class="bx bxs-door-open"></i>Class</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.view_attendance')}}"
+            ><i class="bx bx-data"></i>Attendance Logs</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none;">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+      <!-- End of Navbar -->
+
+      <!-- Main content -->
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Dashboard {{admin.user_fullname}}</h1>
+            <ul class="breadcrumb">
+              <a href="{{url_for('user_ep.dashboard')}}"><li>Dashboard</li></a>
+              /
+              <li>
+                <a href="" class="active"> {{admin.user_fullname}} </a>
+              </li>
+            </ul>
+          </div>
+          <div class="show-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  {% if category == "success" %}
+                    <span class="alert alert-success" role="alert" style="background-color: rgb(209,231,221); border-radius: 10px; text-align: left; padding: 10px; margin-top: 50px; margin-bottom: 50px;"
+                    >
+                      {{message}}
+                    </span>
+                  {% else %}
+                    {% if message is not string %}
+                      <ul style="background-color: rgb(248,215,218); border-radius: 10px; text-align: left; padding: 10px; margin-bottom: 30px;"
+                      >
+                        {% for msg in message %}
+                          <li>{{msg}}</li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      <span class="alert alert-success" role="alert" style="background-color: rgb(248,215,218); border-radius: 10px; text-align: left; padding: 10px; margin-top: 50px; margin-bottom: 50px;"
+                      >
+                        {{message}}
+                      </span>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <ul class="insights">
+          <li>
+            <i class="bx bx-group"></i>
+            <span class="info">
+              <h3>{{total_students}}</h3>
+              <p>Total Students</p>
+            </span>
+          </li>
+          <li>
+            <i class="bx bxs-user"></i>
+            <span class="info">
+              <h3>{{total_lecturers}}</h3>
+              <p>Total Lecturers</p>
+            </span>
+          </li>
+          <li>
+            <i class="bx bxs-graduation"></i>
+            <span class="info">
+              <h3>{{total_courses}}</h3>
+              <p>Total Courses</p>
+            </span>
+          </li>
+          <li>
+            <i class="bx bxs-door-open"></i>
+            <span class="info">
+              <h3>{{total_classes}}</h3>
+              <p>Total Classes</p>
+            </span>
+          </li>
+        </ul>
+        <!-- End of Insights -->
+
+        <!-- Tabel Mahasiswa Terdaftar -->
+        <div class="bottom-data">
+          <div class="orders" data-table="mahasiswa">
+            <div class="header" data-table="mahasiswa">
+              <i class="bx bx-table" data-table="mahasiswa"></i>
+              <h3>Registered Students</h3>
+              <div class="filter-dropdown">
+                <select id="mahasiswa-data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter bx-filter-mahasiswa"></i>
+              </div>
+              <input
+                type="search"
+                placeholder="Search..."
+                class="search-input"
+              />
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th class="data">NIM</th>
+                  <th class="data">Class</th>
+                  <th class="data">Total courses</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in students %}
+                <tr>
+                  <td>
+                    <img
+                      src="{{url_for('static', filename='images/profile_logo.png')}}"
+                    />
+                    <p>{{student.user_fullname}}</p>
+                  </td>
+                  <!-- Student nim -->
+                  <td>{{student.user_id}}</td>
+                  <!-- Student class -->
+                  <td>{{student.student_class}}</td>
+                  <!-- Studenet total courses -->
+                  <td>{{student_courses[student.user_id]}}</td>
+                  <td class="action">
+                    <a
+                      href="#"
+                      class="status completed"
+                      onclick="openModalStudent('{{student.user_id}}', '{{student.user_fullname}}', '{{student.student_class}}', '{{student.user_email_address}}', '{{student.user_home_address}}')"
+                    >
+                      <i class="bx bxs-edit ed"></i>edit
+                    </a>
+                      <button type="submit" class="status delete" onclick="confirmDelete('student', '{{student.user_id}}')">
+                        <i class="bx bxs-trash ed"></i>delete
+                      </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="mahasiswa-prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="mahasiswa-current-page">Page 1</span>
+              <button id="mahasiswa-next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabel Dosen Terdaftar -->
+          <div class="orders" data-table="dosen">
+            <div class="header" data-table="dosen">
+              <i class="bx bx-table" data-table="dosen"></i>
+              <h3>Registered Lecturers</h3>
+              <div class="filter-dropdown">
+                <select id="dosen-data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter bx-filter-dosen"></i>
+              </div>
+              <input
+                type="search"
+                placeholder="Search..."
+                class="search-input"
+              />
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Lecturer</th>
+                  <th>NIP</th>
+                  <th>Major</th>
+                  <th>Total courses</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for lecturer in lecturers %}
+                <tr>
+                  <td>
+                    <img
+                      src="{{url_for('static', filename='images/profile_logo.png')}}"
+                    />
+                    <p>{{lecturer.user_fullname}}</p>
+                  </td>
+                  <td>{{lecturer.user_id}}</td>
+                  <td>{{lecturer.lecturer_major.value}}</td>
+                  <td>{{lecturer_courses[lecturer.user_id]}}</td>
+                  <td class="action">
+                    <a
+                      href="#"
+                      class="status completed"
+                      onclick="openModalLecturer('{{lecturer.user_id}}', '{{lecturer.user_fullname}}', '{{lecturer.lecturer_major.value}}', '{{lecturer.user_email_address}}', '{{lecturer.user_home_address}}')"
+                    >
+                      <i class="bx bxs-edit ed"></i>edit
+                    </a>
+                    <button type="submit" class="status delete">
+                        <i class="bx bxs-trash ed" onclick="confirmDelete('lecturer', '{{lecturer.user_id}}')"></i>delete
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="dosen-prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="dosen-current-page">Page 1</span>
+              <button id="dosen-next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div class="confirmation-modal" id="confirmation-modal-student">
+      <div class="modal-content">
+        <h2>Delete Confirmation</h2>
+        <p>Are you sure you want to delete this student?</p>
+        <div class="modal-buttons">
+          <form id="deleteStudentForm" method="POST">
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <button type="submit" class="status delete">
+              Yes
+            </button>
+          </form>
+          <button id="cancel-delete-student">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation-modal" id="confirmation-modal-lecturer">
+      <div class="modal-content">
+        <h2>Delete Confirmation</h2>
+        <p>Are you sure you want to delete this lecturer?</p>
+        <div class="modal-buttons">
+          <form id="deleteLecturerForm" method="POST">
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <button type="submit" class="status delete">Yes
+            </button>
+          </form>
+          <button id="cancel-delete-lecturer">No</button>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Form Update student -->
+    <div class="modal" id="updateModalStudent">
+      <div class="modal-content">
+        <span class="close" onclick="closeModalStudent()">&times;</span>
+        <h2>Update Student</h2>
+        <form id="updateStudentForm" method="POST">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <label for="studentNIM">Student NIM:</label>
+          <input type="text" id="studentNIM" name="student_nim" readonly />
+
+          <label for="studentClass">Student Class:</label>
+          <input type="text" id="studentClass" name="student_class" readonly />
+
+          <label for="studentName">Student Name:</label>
+          <input type="text" id="studentName" name="student_name" />
+          
+          <label for="newPassword">New Student Password:</label>
+          <input type="password" id="newPassword" name="student_pw" />
+
+          <label for="confirmNewPassword">Confirm New Student Password:</label>
+          <input type="password" id="confirmNewPassword" name="student_confirm_pw" />
+
+          <label for="studentUID">New Student UID</label>
+          <input type="text" id="studentUID" name="student_uid" />
+
+          <label for="studentEmailAddress">Student Email Address:</label>
+          <input type="studentEmailAddress" id="studentEmailAddress" name="student_email_address" />
+
+          <label for="studentHomeAddress">Student Home Rumah Address:</label>
+          <input type="text" id="studentHomeAddress" name="student_home_address" />
+
+          <div class="buttons">
+            <button type="submit" class="update">
+              Update
+            </button>
+            <button type="button" class="cancel" onclick="closeModalStudent()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal Form Update lecturer -->
+    <div class="modal" id="updateModalLecturer">
+      <div class="modal-content">
+        <span class="close" onclick="closeModalLecturer()">&times;</span>
+        <h2>Update Lecturer</h2>
+        <form id="updateLecturerForm" method="POST">
+          <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+          <label for="lecturerNIP">Lecturer NIP:</label>
+          <input type="text" id="lecturerNIP" name="lecturer_nip" readonly />
+
+          <label for="lecturerMajor">Lecturer Major:</label>
+          <input type="text" id="lecturerMajor" name="lecturer_major" readonly />
+
+          <label for="lecturerName">Lecturer Name:</label>
+          <input type="text" id="lecturerName" name="lecturer_name" />
+
+          <label for="newPassword">New Lecturer Password:</label>
+          <input type="password" id="newPassword" name="lecturer_pw" />
+
+          <label for="confirmNewPassword">Confirm New Lecturer Password:</label>
+          <input type="password" id="confirmNewPassword" name="lecturer_confirm_pw" />
+
+          <label for="lecturerUID">New Lecturer UID:</label>
+          <input type="text" id="lecturerUID" name="lecturer_uid" />
+
+          <label for="lecturerEmailAddress">Lecturer Email Address:</label>
+          <input type="email" id="lecturerEmailAddress" name="lecturer_email_address" />
+
+          <label for="lecturerHomeAddress">Lecturer Home Address:</label>
+          <input type="text" id="lecturerHomeAddress" name="lecturer_home_address" />
+
+          <div class="buttons">
+            <button type="submit" class="update">
+              Update
+            </button>
+            <button type="button" class="cancel" onclick="closeModalLecturer()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- End of Modal Form Update Lecturer -->
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      const searchButtons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn"
+      );
+      const searchButtonIcons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn .bx"
+      );
+      const searchInputs = document.querySelectorAll(
+        ".bottom-data .orders .header .search-input"
+      );
+
+      searchButtons.forEach((searchButton, index) => {
+        const searchButtonIcon = searchButtonIcons[index];
+        const searchInput = searchInputs[index];
+
+        searchButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          searchInput.classList.toggle("show");
+
+          if (searchInput.classList.contains("show")) {
+            searchButtonIcon.classList.replace("bx-search", "bx-x");
+            searchInput.focus(); // Fokuskan input textfield setelah ditampilkan
+          } else {
+            searchButtonIcon.classList.replace("bx-x", "bx-search");
+          }
+        });
+      });
+
+      // Identifikasi elemen-elemen terkait dengan tabel mahasiswa
+      const mahasiswaTable = document.querySelector(
+        ".orders[data-table='mahasiswa']"
+      );
+      const mahasiswaFilterIcon = document.querySelector(
+        ".bx-filter-mahasiswa"
+      );
+      const mahasiswaFilterDropdown =
+        mahasiswaTable.querySelector(".filter-dropdown");
+      const mahasiswaDataFilterSelect = document.getElementById(
+        "mahasiswa-data-filter"
+      );
+      const mahasiswaTableRows =
+        mahasiswaTable.querySelectorAll("table tbody tr");
+      const mahasiswaPrevPageButton = document.getElementById(
+        "mahasiswa-prev-page"
+      );
+      const mahasiswaNextPageButton = document.getElementById(
+        "mahasiswa-next-page"
+      );
+      const mahasiswaCurrentPageSpan = document.getElementById(
+        "mahasiswa-current-page"
+      );
+
+      // Identifikasi elemen-elemen terkait dengan tabel dosen
+      const dosenTable = document.querySelector(".orders[data-table='dosen']");
+      const dosenFilterIcon = document.querySelector(".bx-filter-dosen");
+      const dosenFilterDropdown = dosenTable.querySelector(".filter-dropdown");
+      const dosenDataFilterSelect = document.getElementById("dosen-data-filter");
+      const dosenTableRows = dosenTable.querySelectorAll("table tbody tr");
+      const dosenPrevPageButton = document.getElementById("dosen-prev-page");
+      const dosenNextPageButton = document.getElementById("dosen-next-page");
+      const dosenCurrentPageSpan = document.getElementById("dosen-current-page");
+
+      // Mahasiswa
+      let currentPageMhs = 1;
+      let itemsPerPageMhs = parseInt(mahasiswaDataFilterSelect.value);
+
+      function updatePaginationMahasiswa() {
+        const totalPages = Math.ceil(
+          mahasiswaTableRows.length / itemsPerPageMhs
+        );
+        mahasiswaCurrentPageSpan.textContent = `Page ${currentPageMhs}`;
+
+        if (currentPageMhs === 1) {
+          mahasiswaPrevPageButton.disabled = true;
+        } else {
+          mahasiswaPrevPageButton.disabled = false;
+        }
+
+        if (currentPageMhs === totalPages) {
+          mahasiswaNextPageButton.disabled = true;
+        } else {
+          mahasiswaNextPageButton.disabled = false;
+        }
+
+        mahasiswaTableRows.forEach((row, index) => {
+          if (
+            index >= (currentPageMhs - 1) * itemsPerPageMhs &&
+            index < currentPageMhs * itemsPerPageMhs
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      mahasiswaFilterIcon.addEventListener("click", function () {
+        mahasiswaFilterDropdown.classList.toggle("active");
+      });
+
+      mahasiswaDataFilterSelect.addEventListener("change", function () {
+        itemsPerPageMhs = parseInt(mahasiswaDataFilterSelect.value);
+        currentPageMhs = 1;
+        updatePaginationMahasiswa();
+      });
+
+      mahasiswaPrevPageButton.addEventListener("click", function () {
+        if (currentPageMhs > 1) {
+          currentPageMhs--;
+          updatePaginationMahasiswa();
+        }
+      });
+
+      mahasiswaNextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(
+          mahasiswaTableRows.length / itemsPerPageMhs
+        );
+        if (currentPageMhs < totalPages) {
+          currentPageMhs++;
+          updatePaginationMahasiswa();
+        }
+      });
+
+      updatePaginationMahasiswa();
+
+      // dosen
+      let currentPageDsn = 1;
+      let itemsPerPageDsn = parseInt(dosenDataFilterSelect.value);
+
+      function updatePaginationDosen() {
+        const totalPages = Math.ceil(dosenTableRows.length / itemsPerPageDsn);
+        dosenCurrentPageSpan.textContent = `Page ${currentPageDsn}`;
+
+        if (currentPageDsn === 1) {
+          dosenPrevPageButton.disabled = true;
+        } else {
+          dosenPrevPageButton.disabled = false;
+        }
+
+        if (currentPageDsn === totalPages) {
+          dosenNextPageButton.disabled = true;
+        } else {
+          dosenNextPageButton.disabled = false;
+        }
+
+        dosenTableRows.forEach((row, index) => {
+          if (
+            index >= (currentPageDsn - 1) * itemsPerPageDsn &&
+            index < currentPageDsn * itemsPerPageDsn
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      dosenFilterIcon.addEventListener("click", function () {
+        dosenFilterDropdown.classList.toggle("active");
+      });
+
+      dosenDataFilterSelect.addEventListener("change", function () {
+        itemsPerPageDsn = parseInt(dosenDataFilterSelect.value);
+        currentPageDsn = 1;
+        updatePaginationDosen();
+      });
+
+      dosenPrevPageButton.addEventListener("click", function () {
+        if (currentPageDsn > 1) {
+          currentPageDsn--;
+          updatePaginationDosen();
+        }
+      });
+
+      dosenNextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(dosenTableRows.length / itemsPerPageDsn);
+        if (currentPageDsn < totalPages) {
+          currentPageDsn++;
+          updatePaginationDosen();
+        }
+      });
+
+      updatePaginationDosen();
+
+      // Modal form for student
+      function openModalStudent(studentNIM, studentName, studentClass, studentEmailAddress, studentHomeAddress) {
+        document.getElementById("studentNIM").value = studentNIM;
+        document.getElementById("studentName").value = studentName;
+        document.getElementById("studentClass").value = studentClass;
+        document.getElementById("studentEmailAddress").value = studentEmailAddress;
+        document.getElementById("studentHomeAddress").value = studentHomeAddress;
+        document.getElementById("updateModalStudent").style.display = "block";
+
+        // Add action attribute to lecturer edit form
+        editStudentForm = document.getElementById('updateStudentForm');
+        editStudentURL = `/admin/${studentNIM}/edit/student`;
+        editStudentForm.action = editStudentURL;
+      }
+       // Modal form for Lecturer
+      function openModalLecturer(lecturerNIP, lecturerName, lecturerMajor, lecturerEmailAddress, lecturerHomeAddress) {
+        document.getElementById("lecturerNIP").value = lecturerNIP;
+        document.getElementById("lecturerName").value = lecturerName;
+        document.getElementById("lecturerMajor").value = lecturerMajor;
+        document.getElementById("lecturerEmailAddress").value = lecturerEmailAddress;
+        document.getElementById("lecturerHomeAddress").value = lecturerHomeAddress;
+        document.getElementById("updateModalLecturer").style.display = "block";
+
+        // Add action attribute to lecturer edit form
+        editLecturerForm = document.getElementById('updateLecturerForm');
+        editLecturerURL = `/admin/${lecturerNIP}/edit/lecturer`;
+        editLecturerForm.action = editLecturerURL;
+      }
+
+      function closeModalStudent() {
+        document.getElementById("updateModalStudent").style.display = "none";
+      }
+      function closeModalLecturer() {
+        document.getElementById("updateModalLecturer").style.display = "none";
+      }
+
+      function confirmDelete(type, id) {
+        const confirmationModal = document.getElementById(`confirmation-modal-${type}`);
+        confirmationModal.style.display = "block";
+    
+        const cancelBtn = document.getElementById(`cancel-delete-${type}`);
+        cancelBtn.onclick = function () {
+          confirmationModal.style.display = "none";
+        };
+    
+        const deleteForm = document.getElementById(`delete${type.charAt(0).toUpperCase() + type.slice(1)}Form`);
+        deleteForm.action = `/admin/${id}/delete/${type}`;
+      }
+    </script>
+  </body>
+</html>

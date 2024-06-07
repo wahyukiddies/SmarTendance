@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='lecturer/style.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='lecturer/SideMenu_Navbar.css')}}"
+    />
+    <title>Lecturer | Dashboard</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li class="active">
+          <a href="{{url_for('user_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('lecturer_ep.view_lecturer_logs')}}"
+            ><i class="bx bx-data"></i>My Attendance Logs</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('lecturer_ep.view_student_data')}}"
+            ><i class="bx bx-data"></i>Student Attendance</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Dashboard {{ lecturer.user_fullname }}</h1>
+            <ul class="breadcrumb">
+              <li>
+                <a href="" class="active">Dashboard</a>
+              </li>
+              /
+            </ul>
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <ul class="insights">
+          <li>
+            <i class="bx bx-group"></i>
+            <span class="info">
+              <h3>{{ total_students }}</h3>
+              <p>Total Students</p>
+            </span>
+          </li>
+          <li>
+            <i class="bx bxs-graduation"></i>
+            <span class="info">
+              <h3>{{ total_courses }}</h3>
+              <p>Total Courses</p>
+            </span>
+          </li>
+          <li>
+            <i class="bx bxs-door-open"></i>
+            <span class="info">
+              <h3>{{ total_classes }}</h3>
+              <p>Total Classes</p>
+            </span>
+          </li>
+        </ul>
+        <!-- End of Insights -->
+
+        <!-- Tabel Mahasiswa Terdaftar -->
+        <div class="bottom-data">
+          <div class="orders" data-table="mahasiswa">
+            <div class="header" data-table="mahasiswa">
+              <i class="bx bx-table" data-table="mahasiswa"></i>
+              <h3>My Students</h3>
+              <div class="filter-dropdown">
+                <select id="mahasiswa-data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter bx-filter-mahasiswa"></i>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th class="data">Student NIM</th>
+                  <th class="data">Student Class</th>
+                  <th class="data">Student Course</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for course_id, course_data in student_courses.items() %} {%
+                for student in course_data['students'] %}
+                <tr>
+                  <td id="fullname">
+                    <img
+                      src="{{ url_for('static', filename='images/profile_logo.png') }}"
+                    />
+                    <p>{{ student.user_fullname }}</p>
+                  </td>
+                  <td>{{ student.user_id }}</td>
+                  <td>{{ student.student_class }}</td>
+                  <td>{{ course_data['course_name'] }}</td>
+                </tr>
+                {% endfor %} {% endfor %}
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="mahasiswa-prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="mahasiswa-current-page">Page 1</span>
+              <button id="mahasiswa-next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabel Course -->
+          <div class="orders" data-table="course">
+            <div class="header" data-table="course">
+              <i class="bx bx-table" data-table="course"></i>
+              <h3>My Courses</h3>
+              <div class="filter-dropdown">
+                <select id="dosen-data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter bx-filter-course"></i>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Course Name</th>
+                  <th>Course ID</th>
+                  <th>Course Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for course in courses %}
+                <tr>
+                  <td>{{ course.course_name }}</td>
+                  <td>{{ course.course_id }}</td>
+                  <td>{{ course.class_course.class_id }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button id="dosen-prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="dosen-current-page">Page 1</span>
+              <button id="dosen-next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      const searchButtons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn"
+      );
+      const searchButtonIcons = document.querySelectorAll(
+        ".bottom-data .orders .header .search-btn .bx"
+      );
+      const searchInputs = document.querySelectorAll(
+        ".bottom-data .orders .header .search-input"
+      );
+
+      searchButtons.forEach((searchButton, index) => {
+        const searchButtonIcon = searchButtonIcons[index];
+        const searchInput = searchInputs[index];
+
+        searchButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          searchInput.classList.toggle("show");
+
+          if (searchInput.classList.contains("show")) {
+            searchButtonIcon.classList.replace("bx-search", "bx-x");
+            searchInput.focus(); // Fokuskan input textfield setelah ditampilkan
+          } else {
+            searchButtonIcon.classList.replace("bx-x", "bx-search");
+          }
+        });
+      });
+
+      // Identifikasi elemen-elemen terkait dengan tabel mahasiswa
+      const mahasiswaTable = document.querySelector(
+        ".orders[data-table='mahasiswa']"
+      );
+      const mahasiswaFilterIcon = document.querySelector(
+        ".bx-filter-mahasiswa"
+      );
+      const mahasiswaFilterDropdown =
+        mahasiswaTable.querySelector(".filter-dropdown");
+      const mahasiswaDataFilterSelect = document.getElementById(
+        "mahasiswa-data-filter"
+      );
+      const mahasiswaTableRows =
+        mahasiswaTable.querySelectorAll("table tbody tr");
+      const mahasiswaPrevPageButton = document.getElementById(
+        "mahasiswa-prev-page"
+      );
+      const mahasiswaNextPageButton = document.getElementById(
+        "mahasiswa-next-page"
+      );
+      const mahasiswaCurrentPageSpan = document.getElementById(
+        "mahasiswa-current-page"
+      );
+
+      // Identifikasi elemen-elemen terkait dengan tabel dosen
+      const dosenTable = document.querySelector(".orders[data-table='course']");
+      const dosenFilterIcon = document.querySelector(".bx-filter-course");
+      const dosenFilterDropdown = dosenTable.querySelector(".filter-dropdown");
+      const dosenDataFilterSelect =
+        document.getElementById("dosen-data-filter");
+      const dosenTableRows = dosenTable.querySelectorAll("table tbody tr");
+      const dosenPrevPageButton = document.getElementById("dosen-prev-page");
+      const dosenNextPageButton = document.getElementById("dosen-next-page");
+      const dosenCurrentPageSpan =
+        document.getElementById("dosen-current-page");
+
+      // Mahasiswa
+      let currentPageMhs = 1;
+      let itemsPerPageMhs = parseInt(mahasiswaDataFilterSelect.value);
+
+      function updatePaginationMahasiswa() {
+        const totalPages = Math.ceil(
+          mahasiswaTableRows.length / itemsPerPageMhs
+        );
+        mahasiswaCurrentPageSpan.textContent = `Page ${currentPageMhs}`;
+
+        if (currentPageMhs === 1) {
+          mahasiswaPrevPageButton.disabled = true;
+        } else {
+          mahasiswaPrevPageButton.disabled = false;
+        }
+
+        if (currentPageMhs === totalPages) {
+          mahasiswaNextPageButton.disabled = true;
+        } else {
+          mahasiswaNextPageButton.disabled = false;
+        }
+
+        mahasiswaTableRows.forEach((row, index) => {
+          if (
+            index >= (currentPageMhs - 1) * itemsPerPageMhs &&
+            index < currentPageMhs * itemsPerPageMhs
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      mahasiswaFilterIcon.addEventListener("click", function () {
+        mahasiswaFilterDropdown.classList.toggle("active");
+      });
+
+      mahasiswaDataFilterSelect.addEventListener("change", function () {
+        itemsPerPageMhs = parseInt(mahasiswaDataFilterSelect.value);
+        currentPageMhs = 1;
+        updatePaginationMahasiswa();
+      });
+
+      mahasiswaPrevPageButton.addEventListener("click", function () {
+        if (currentPageMhs > 1) {
+          currentPageMhs--;
+          updatePaginationMahasiswa();
+        }
+      });
+
+      mahasiswaNextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(
+          mahasiswaTableRows.length / itemsPerPageMhs
+        );
+        if (currentPageMhs < totalPages) {
+          currentPageMhs++;
+          updatePaginationMahasiswa();
+        }
+      });
+
+      updatePaginationMahasiswa();
+
+      // course
+      let currentPageCourse = 1;
+      let itemsPerPageCourse = parseInt(dosenDataFilterSelect.value);
+
+      function updatePaginationCourse() {
+        const totalPages = Math.ceil(
+          dosenTableRows.length / itemsPerPageCourse
+        );
+        dosenCurrentPageSpan.textContent = `Page ${currentPageCourse}`;
+
+        if (currentPageCourse === 1) {
+          dosenPrevPageButton.disabled = true;
+        } else {
+          dosenPrevPageButton.disabled = false;
+        }
+
+        if (currentPageCourse === totalPages) {
+          dosenNextPageButton.disabled = true;
+        } else {
+          dosenNextPageButton.disabled = false;
+        }
+
+        dosenTableRows.forEach((row, index) => {
+          if (
+            index >= (currentPageCourse - 1) * itemsPerPageCourse &&
+            index < currentPageCourse * itemsPerPageCourse
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      dosenFilterIcon.addEventListener("click", function () {
+        dosenFilterDropdown.classList.toggle("active");
+      });
+
+      dosenDataFilterSelect.addEventListener("change", function () {
+        itemsPerPageCourse = parseInt(dosenDataFilterSelect.value);
+        currentPageCourse = 1;
+        updatePaginationCourse();
+      });
+
+      dosenPrevPageButton.addEventListener("click", function () {
+        if (currentPageCourse > 1) {
+          currentPageCourse--;
+          updatePaginationCourse();
+        }
+      });
+
+      dosenNextPageButton.addEventListener("click", function () {
+        const totalPages = Math.ceil(
+          dosenTableRows.length / itemsPerPageCourse
+        );
+        if (currentPageCourse < totalPages) {
+          currentPageCourse++;
+          updatePaginationCourse();
+        }
+      });
+
+      updatePaginationCourse();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{url_for('static', filename='user/login.css')}}"
+    />
+    <title>SmarTendance</title>
+  </head>
+  <body>
+    <header class="header">
+      <a href="#" class="logo"
+        ><img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="E-learning PNJ Logo"
+          width="125"
+          height="75"
+        />
+        <p>Smartendance</p></a
+      >
+      <i class="bx bx-menu menu-icon" id="mobile-menu"></i>
+      <nav class="nav" id="main-nav">
+        <a href="#">Contact</a>
+        <a href="#">Tutorial</a>
+        <a href="{{url_for('user_ep.login')}}">Login</a>
+      </nav>
+    </header>
+
+    <section class="Login">
+      <div class="content">
+        <h2>Welcome to SmarTendance</h2>
+        <p>
+          If you don't have account, please contact admin to register your
+          account to login
+        </p>
+        <a href="#">Get Started</a>
+      </div>
+
+      <div class="wrapper-login">
+        <h2>Login</h2>
+        <div class="show-messages">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %} {% if category ==
+          "success" %}
+          <span
+            class="alert alert-success"
+            role="alert"
+            style="
+              background-color: rgb(209, 231, 221);
+              border-radius: 10px;
+              text-align: left;
+              padding: 10px;
+              margin-top: 30px;
+              margin-bottom: 30px;
+            "
+          >
+            {{message}}
+          </span>
+          <!-- category == "danger" -->
+          {% else %}
+          <span
+            class="alert alert-success"
+            role="alert"
+            style="
+              background-color: rgb(248, 215, 218);
+              border-radius: 10px;
+              text-align: left;
+              padding: 10px;
+              margin-top: 30px;
+              margin-bottom: 30px;
+            "
+          >
+            {{message}}
+          </span>
+          {% endif %} {% endfor %} {% endif %} {% endwith %}
+        </div>
+        <form action="{{url_for('user_ep.login')}}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="input-box">
+            <span class="icon"><ion-icon name="mail"></ion-icon></span>
+            <input type="text" name="user_id" id="user_id" required />
+            <label for="user_id">User ID</label>
+          </div>
+          <div class="input-box">
+            <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
+            <input type="password" name="user_pw" id="user_pw" required />
+            <span class="show-password" onclick="togglePasswordVisibility()"
+              ><ion-icon name="eye"></ion-icon
+            ></span>
+            <label for="user_pw">User Password</label>
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+      </div>
+    </section>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+      function togglePasswordVisibility() {
+        const passwordInput = document.getElementById("user_pw");
+        const eyeIcon = document.querySelector(".show-password ion-icon");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.name = "eye-off";
+        } else {
+          passwordInput.type = "password";
+          eyeIcon.name = "eye";
+        }
+      }
+
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mainNav = document.getElementById("main-nav");
+      mobileMenu.addEventListener("click", () => {
+        mainNav.classList.toggle("show-menu");
+      });
+    </script>
+  </body>
+</html>
