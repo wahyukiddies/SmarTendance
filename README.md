@@ -22,7 +22,7 @@ docker-compose up --build
 git clone https://github.com/wahyukiddies/Smartendance-Kel2.git
 
 # Change directory to smartendance v1
-cd smartendance
+cd web/
 
 # Install python3-venv
 sudo apt install -y python3-venv
@@ -38,6 +38,10 @@ source .venv/Scripts/activate
 # Installing requirements
 pip install -r requirements.txt
 
-# Running the wsgi.py file
+# Database scheme migration
+# MAKE SURE YOUR MySQL DATABASE SERVER IS RUNNING !
+flask db init && flask db migrate -m "Initial db migration" && flask db upgrade
+
+# Finally, you can running the app via wsgi.py file.
 python wsgi.py
 ```

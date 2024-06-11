@@ -85,6 +85,9 @@ ENV/
 .flaskenv
 .mysqlenv
 
+# Dummy SQL
+*.sql
+
 # Spyder project settings
 .spyderproject
 
