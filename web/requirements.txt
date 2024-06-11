@@ -6,6 +6,7 @@ blinker==1.7.0
 cffi==1.16.0
 click==8.1.7
 colorama==0.4.6
+cryptography==42.0.8
 distlib==0.3.8
 dnspython==2.4.2
 email-validator==2.1.0.post1
@@ -42,6 +43,8 @@ pytz==2023.3.post1
 simple-websocket==1.0.0
 six==1.16.0
 SQLAlchemy==2.0.25
+typing_extensions==4.12.1
+tzdata==2024.1
 Werkzeug==3.0.1
 wsproto==1.2.0
 WTForms==3.1.2

@@ -11,17 +11,16 @@ RUN mkdir -pm755 /home/smartendance/web
 # Setting the working directory
 WORKDIR /home/smartendance/web
 
-# Copying all the files to the working directory
+# Copying all the files to the working directory, including .flaskenv file
 COPY . /home/smartendance/web
-
-# Copying .flaskenv file
-COPY .flaskenv /home/smartendance/web/
 
 # Installing required dependencies
 RUN pip3 install -r requirements.txt --no-cache-dir
+# Add execute permission to the entrypoint script
+RUN chmod +x entrypoint.sh
 
 # Exposing the port
 EXPOSE 5555
 
-# Running the application
-CMD ["python3", "wsgi.py"]
+# Running the application via entrypoint script
+CMD [ "./entrypoint.sh" ]

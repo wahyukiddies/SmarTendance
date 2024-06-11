@@ -5,6 +5,13 @@ Dockerfile
 .dockerignore
 docker-compose.yaml
 
+# Python3 virtual environment
+.venv/
+.flaskenv
+
+# MySQL DB environment
+.mysqlenv
+
 /credentials
 /cache
 /store
