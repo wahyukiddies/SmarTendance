@@ -319,6 +319,15 @@
                 <i class="bx bx-chevrons-right"></i>
               </button>
             </div>
+          <!-- class deactivate button -->
+          <div class="deactive">
+            <div class="header">
+              <h3>Deactivate All Class:</h3>
+              <button onClick="openModalDeactiv()">
+                <i class="bx bx-power-off"></i>
+                <span>Deactivate</span>
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -353,6 +362,30 @@
         </div>
       </div>
     </div>
+
+    <!-- Deactivate Modal -->
+    <div id="deactivate" class="modal">
+      <div class="modal-content">
+        <p>Are you sure you want to deactivate all class?</p>
+        <button
+          id="confirmDeactivate"
+          class="update"
+          onclick="confirmDeactivate()"
+          type="submit"
+        >
+          Yes
+        </button>
+        <button
+          id="cancelDeactivate"
+          class="cancel"
+          type="button"
+          onclick="cancelDeactivate()"
+        >
+          No
+        </button>
+      </div>
+    </div>
+    
     <!-- Modal Form Update student -->
     <div class="modal" id="updateModalStudent">
       <div class="modal-content">
@@ -678,6 +711,36 @@
     
         const deleteForm = document.getElementById(`delete${type.charAt(0).toUpperCase() + type.slice(1)}Form`);
         deleteForm.action = `/admin/${id}/delete/${type}`;
+      }
+
+      // deactive modal
+      const modal = document.getElementById("deactivateModal");
+      const span = document.getElementsByClassName("close")[0];
+      let currentCourseId;
+
+      function openModalDeactivate() {
+        modal.style.display = "block";
+      }
+
+      function confirmDeactivate() {
+        fetch(`/api/deactivate_class`, { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Refresh the table or remove the deactivated class row
+              window.location.reload();
+            }
+          });
+        modal.style.display = "none";
+      }
+
+      function cancelDeactivate() {
+        document.getElementById("deactivate").style.display = "none";
+      }
+
+      // coba
+      function openModalDeactiv() {
+        document.getElementById("deactivate").style.display = "block";
       }
     </script>
   </body>
