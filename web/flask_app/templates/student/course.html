@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='student/course.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='student/SideMenu_Navbar.css')}}"
+    />
+    <title>Smartendance</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('student_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li class="active">
+          <a href="{{url_for('student_ep.course')}}"
+            ><i class="bx bxs-graduation"></i>Course</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('student_ep.view_attendance')}}"
+            ><i class="bx bx-data"></i>My Attendance Logs</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <h3 id="tanggal"></h3>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>My Course</h1>
+            <ul class="breadcrumb">
+              <li><a href="" class="active">Course</a></li>
+              /
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tabel Course Terdaftar -->
+        <div class="bottom-data">
+          <div class="orders">
+            <div class="header">
+              <i class="bx bxs-book"></i>
+              <h3>Courses</h3>
+              <i class="bx bx-filter"></i>
+              <i class="bx bx-search"></i>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th class="data">Course Name</th>
+                  <th class="data">Lecturer</th>
+                  <th class="data">Day</th>
+                  <th class="data">Time Start</th>
+                  <th class="data">Time End</th>
+                  <th class="data">Room</th>
+                  <th class="data">SKS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sistem Embedded-TMJ3B</td>
+                  <td>Prihatin Oktivasari</td>
+                  <td>Wednesday</td>
+                  <td>13:00:00</td>
+                  <td>16:30:00</td>
+                  <td>AA204</td>
+                  <td>4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="{{url_for('static', filename='student/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+    </script>
+  </body>
+</html>

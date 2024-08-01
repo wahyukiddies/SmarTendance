@@ -1,0 +1,357 @@
+.content main{
+    width: 100%;
+    padding: 36px 24px;
+    max-height: calc(100vh - 56px);
+}
+
+.content main .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 16px;
+    flex-wrap: wrap;
+}
+
+.content main .header .left h1{
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb{
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+}
+
+.content main .header .left .breadcrumb li{
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb li a{
+    color: var(--dark-grey);
+    pointer-events: none;
+}
+
+.content main .header .left .breadcrumb li a.active{
+    color: var(--primary);
+    pointer-events: none;
+}
+
+/* Dropdown radio */
+.select-box {
+    position: relative;
+    display: flex;
+    max-width: 500px;
+    min-width: 300px;
+    flex-direction: column;
+    margin-bottom: 22px;
+    text-align: left;
+    margin-top: 40px; 
+  }
+  
+  .select-box #class {
+    display: none;
+    margin-top: -21px;
+    margin-left: 10px;
+    margin-bottom: 4px;
+    color: var(--dark);
+  }
+  
+  .select-box .options-container {
+    background: var(--dark-select); /* --dark-select */
+    color: var(--dark);
+    max-height: 0;
+    width: 100%;
+    opacity: 0;
+    transition: all 0.4s;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    order: 1;
+  }
+  
+  .selected {
+    background: var(--dark-select); /* --dark-select */
+    border-radius: 8px;
+    margin-bottom: 8px;
+    color: var(--dark);
+    position: relative;
+  
+    order: 0;
+  }
+  
+  .selected::after {
+    content: "";
+    background: url("images/arrow-down.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+  
+    position: absolute;
+    height: 100%;
+    width: 32px;
+    right: 10px;
+    top: 5px;
+  
+    transition: all 0.4s;
+  }
+  
+  .select-box .options-container.active {
+    max-height: 240px;
+    opacity: 1;
+    overflow-y: scroll;
+  }
+  
+  .select-box .options-container.active + .selected::after {
+    transform: rotateX(180deg);
+    top: -6px;
+  }
+  
+  .select-box .options-container::-webkit-scrollbar {
+    width: 8px;
+    background: var(--dark-select); /* --dark-select */
+    border-radius: 0 8px 8px 0;
+  }
+  
+  .select-box .options-container::-webkit-scrollbar-thumb {
+    background: #525861;
+    border-radius: 8x;
+    transition: all 0.4s;
+  }
+  
+  .select-box .option,
+  .selected {
+    padding: 12px 24px;
+    cursor: pointer;
+  }
+  
+  .select-box .option:hover {
+    background: var(--select-hover); /* --select-hover */
+  }
+  
+  .select-box label {
+    cursor: pointer;
+  }
+  
+  .select-box .option .radio {
+    display: none;
+  }
+  
+  /* Searchbox */
+  
+  .search-box input {
+    display: none;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    position: relative;
+    border-radius: 8px 8px 0 0;
+    z-index: 100;
+    border: 8px solid var(--dark-select); /* --dark-select */
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s;
+  }
+  
+  .search-box input:focus {
+    outline: none;
+  }
+  
+  .select-box .options-container.active ~ .search-box input {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* end */
+
+.content main .bottom-data{
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 24px;
+    margin-top: 24px;
+    width: 100%;
+    color: var(--dark);
+    flex-direction: column;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.content main .bottom-data>div{
+    border-radius: 20px;
+    background: var(--light);
+    padding: 24px;
+    overflow-x: auto;
+}
+
+.content main .bottom-data .header{
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+    margin-bottom: 24px;
+}
+
+.content main .bottom-data .header h3{
+    margin-right: auto;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.content main .bottom-data .header .bx{
+    cursor: pointer;
+}
+
+.content main .bottom-data .orders{
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.content main .bottom-data .orders table{
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.content main .bottom-data .orders table th{
+    padding-bottom: 12px;
+    font-size: 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey);
+    
+}
+
+.content main .bottom-data .orders table td{
+    padding: 16px 7px;
+}
+
+.content main .bottom-data .orders table tr td:first-child{
+    text-align: left;
+    padding-left: 15px;
+}
+
+.content main .bottom-data .orders table td img{
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.content main .bottom-data .orders table tbody tr{
+    
+    transition: all 0.3s ease;
+}
+
+.content main .bottom-data .orders table tbody tr:hover{
+    background: var(--grey);
+}
+
+.content main .bottom-data .orders table tr td .status{
+    font-size: 15px;
+    padding: 6px 16px;
+    color: #fff;
+    border-radius: 20px;
+    font-weight: 700;
+    background-color: var(--success);
+}
+
+.content main .bottom-data .orders table tr th, .content main .bottom-data .orders table tr td {
+    text-align: center;
+}
+
+.edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit .status{
+    display: flex;
+    align-items: center;
+}
+
+.edit .bx {
+    font-size: 1.5rem;
+    margin-right: 4px;
+}
+
+/* filter & pagination */
+
+.content main .bottom-data .header .filter-dropdown {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.content main .bottom-data .header .filter-dropdown select {
+    background: var(--grey);
+    border: none;
+    font-size: 17px;
+    color: var(--dark);
+    cursor: pointer;
+    width: 75px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.content .orders .header .filter-dropdown select {
+    display: none;
+}
+
+.content .orders .header .filter-dropdown.active select {
+    display: block;
+    margin-right: 5px;
+}
+
+.content .pagination {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    align-items: center;
+    justify-content: left;
+}
+
+.content .pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 5px;
+    color: var(--light-grey);
+    margin: 0 10px;
+}
+
+.content .pagination button:disabled {
+    color: var(--dark-grey);
+    cursor: not-allowed;
+}
+
+#prev-page, #next-page {
+    background-color: var(--grey);
+    padding: 5px;
+    border-radius: 4px;
+}
+
+
+@media screen and (max-width: 768px) {
+    .content{
+        width: calc(100% - 60px);
+        left: 200px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .content main .bottom-data .header{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .orders table{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .reminders .task-list{
+        min-width: 340px;
+    }
+
+    .content main .bottom-data .orders table{
+        width: 100vw;
+    }
+
+}

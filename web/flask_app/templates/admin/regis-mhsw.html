@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/regis-form.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin/SideMenu_Navbar.css')}}"
+    />
+    <title>Admin | Student Registration</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="{{url_for('user_ep.dashboard')}}" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li>
+          <a href="{{url_for('user_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.courses')}}"
+            ><i class="bx bxs-graduation"></i>Course</a
+          >
+        </li>
+        <li class="active">
+          <a href="{{url_for('admin_ep.add')}}"
+            ><i class="bx bx-group"></i>Registration</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.classes')}}"
+            ><i class="bx bxs-door-open"></i>Class</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('admin_ep.view_attendance')}}"
+            ><i class="bx bx-data"></i>Attendance Logs</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input" style="display: none">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"></label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+      <!-- End of Navbar -->
+
+      <!-- Main Content -->
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Student Account Registration</h1>
+            <ul class="breadcrumb">
+              <a href="{{url_for('admin_ep.add')}}"><li>Registration</li></a>
+              /
+              <li>
+                <a href="{{url_for('admin_ep.add_student')}}" class="active">
+                  Student Account Registration
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="container">
+          <div class="registration-form">
+            <form
+              action="{{url_for('admin_ep.add_student')}}"
+              method="POST"
+              id="registration-form"
+            >
+              <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+              <h2>Student Registration Form</h2>
+              <div class="show-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <ul
+                  style="
+                    background-color: rgb(248, 215, 218);
+                    border-radius: 10px;
+                    text-align: left;
+                    padding: 10px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  {% for msg in message %} {% if category == "danger" %}
+                  <li>{{msg}}</li>
+                  {% endif %} {% endfor %}
+                </ul>
+                {% endfor %} {% endif %} {% endwith %}
+              </div>
+              <div class="form-group">
+                <label for="nama">Student Name</label>
+                <input type="text" id="nama" name="student_name" required />
+              </div>
+              <div class="form-group">
+                <label for="nim">Student NIM</label>
+                <input type="text" id="nim" name="student_nim" required />
+              </div>
+
+              <!-- DROPDOWN -->
+              <div class="select-box">
+                <label for="options-container" id="class">Student Class</label>
+                <div class="options-container" id="options-container">
+                  {% for class in student_class %}
+                  <div class="option">
+                    <input
+                      type="radio"
+                      class="radio"
+                      id="{{class.class_id}}"
+                      name="student_class"
+                      value="{{class.class_id}}"
+                      required
+                    />
+                    <label for="{{class.class_id}}"> {{class.class_id}} </label>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <div class="selected">Choose a class</div>
+
+                <div class="search-box">
+                  <input type="text" placeholder="Search Kelas..." />
+                </div>
+              </div>
+
+              <!-- END -->
+              <div class="form-group">
+                <label for="password">Student Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="student_pw"
+                  required
+                />
+                <span
+                  class="show-password"
+                  onclick="togglePasswordVisibility('password')"
+                  ><ion-icon name="eye-off-outline" id="hide"></ion-icon
+                ></span>
+              </div>
+              <div class="form-group">
+                <label for="confirm-pass"> Confirm Student Password </label>
+                <input
+                  type="password"
+                  id="confirm-pass"
+                  name="student_confirm_pw"
+                  required
+                />
+                <span
+                  class="show-password"
+                  onclick="togglePasswordVisibility('confirm-pass')"
+                  ><ion-icon name="eye-off-outline" id="hide"></ion-icon
+                ></span>
+              </div>
+              <div class="form-group">
+                <label for="email">Student Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="student_email_address"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="home-address">Student Home Address</label>
+                <input
+                  type="text"
+                  id="home-address"
+                  name="student_home_address"
+                />
+              </div>
+              <div class="form-uid" id="uid-btn">
+                <button type="button" id="show-uid-popup">
+                  <i class="bx bx-rfid"></i><span>Scan Student ID Card</span>
+                </button>
+              </div>
+              <div class="form-group">
+                <label for="uid" id="label-uid">Student Card UID</label>
+                <input
+                  type="password"
+                  id="uid"
+                  placeholder="Student Card UID"
+                  name="student_uid"
+                  readonly
+                  required
+                />
+              </div>
+              <div class="delete">
+                <button type="button">
+                  <i class="bx bxs-trash"></i>
+                  <span>Delete Student Card UID</span>
+                </button>
+              </div>
+              <button type="submit" class="btn-register">
+                Register Student
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- End of Registration Form -->
+      </main>
+    </div>
+    <div class="popup" id="uid-popup">
+      <div class="popup-container">
+        <h2>Student ID Card Registration</h2>
+        <div id="wifi-loader">
+          <svg class="circle-outer" viewBox="0 0 86 86">
+            <circle class="back" cx="43" cy="43" r="40"></circle>
+            <circle class="front" cx="43" cy="43" r="40"></circle>
+            <circle class="new" cx="43" cy="43" r="40"></circle>
+          </svg>
+          <svg class="circle-middle" viewBox="0 0 60 60">
+            <circle class="back" cx="30" cy="30" r="27"></circle>
+            <circle class="front" cx="30" cy="30" r="27"></circle>
+          </svg>
+          <svg class="circle-inner" viewBox="0 0 34 34">
+            <circle class="back" cx="17" cy="17" r="14"></circle>
+            <circle class="front" cx="17" cy="17" r="14"></circle>
+          </svg>
+          <div class="text" data-text="Scanning"></div>
+        </div>
+        <div class="complete-mark">
+          <svg class="icon-success" viewBox="0 0 76 76">
+            <circle cx="38" cy="38" r="36" fill="#66bb6a"></circle>
+            <path
+              fill="none"
+              stroke="#FFFFFF"
+              stroke-width="7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-dasharray="56"
+              stroke-dashoffset="56"
+              d="M17.7,40.9l10.9,10.9l28.7-28.7"
+            ></path>
+          </svg>
+        </div>
+        <div class="scan-success">Student Card UID Successfully Read</div>
+        <input
+          type="password"
+          id="uid-input"
+          placeholder="Please tap the student id card"
+          readonly
+        />
+        <div class="popup-button" align-self="flex-end">
+          <button id="close-popup" class="cancel">Cancel</button>
+          <button id="register-uid-button">Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='admin/index.js')}}"></script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+
+    <script>
+      const formGroups = document.querySelectorAll(".form-group input");
+
+      formGroups.forEach((input) => {
+        input.addEventListener("focus", (event) => {
+          const label = event.target.previousElementSibling;
+          label.classList.add("active");
+        });
+
+        input.addEventListener("blur", (event) => {
+          if (event.target.value === "") {
+            const label = event.target.previousElementSibling;
+            label.classList.remove("active");
+          }
+        });
+      });
+
+      sideLinks.forEach((item) => {
+        const li = item.parentElement;
+        item.addEventListener("click", () => {
+          sideLinks.forEach((i) => {
+            i.parentElement.classList.remove("active");
+          });
+          li.classList.add("active");
+
+          const isSidebarOpen = !sideBar.classList.contains("close");
+          localStorage.setItem("sidebarOpen", isSidebarOpen);
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+
+      function togglePasswordVisibility(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.querySelector(
+          `#${inputId} + .show-password ion-icon`
+        );
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          eyeIcon.name = "eye";
+        } else {
+          passwordInput.type = "password";
+          eyeIcon.name = "eye-off-outline";
+        }
+      }
+
+      const showUidButton = document.getElementById("show-uid-popup");
+      const popup = document.querySelector(".popup");
+      const closePopupButton = document.getElementById("close-popup");
+      const uidInput = document.getElementById("uid");
+      const registerUidButton = document.getElementById("register-uid-button");
+      const labelUid = document.getElementById("label-uid");
+      const uidInputField = document.getElementById("uid-input");
+
+      showUidButton.addEventListener("click", () => {
+        popup.style.display = "flex";
+      });
+
+      closePopupButton.addEventListener("click", () => {
+        popup.style.display = "none";
+        uidInputField.value = ""; // Reset value input UID
+        wifiLoader.style.display = "flex";
+        completeMark.style.display = "none";
+        scanSuccess.style.display = "none";
+        completeMark.classList.remove("success");
+      });
+
+      labelUid.style.display = "none";
+
+      registerUidButton.addEventListener("click", () => {
+        const uidInputValue = uidInputField.value;
+        uidInputField.value = "";
+        wifiLoader.style.display = "flex";
+        completeMark.style.display = "none";
+        scanSuccess.style.display = "none";
+        completeMark.classList.remove("success");
+
+        if (uidInputValue.trim() === "") {
+          const uidInputVal = uidInput.value;
+          // Set value untuk input dengan id "uid"
+          uidInput.value = uidInputValue;
+
+          // const uidHiddenVal = hiddenInput.value;
+          if (uidInputVal.trim() !== "") {
+            uidInput.value = uidInputValue;
+          }
+        } else {
+          uidInput.value = uidInputValue;
+        }
+
+        if (uidInputValue) {
+          labelUid.style.display = "block";
+        } else {
+          labelUid.style.display = "none";
+        }
+
+        popup.style.display = "none";
+      });
+
+      // DROPDOWN
+
+      const selected = document.querySelector(".selected");
+      const optionsContainer = document.querySelector(".options-container");
+      const searchBox = document.querySelector(".search-box input");
+      const label = document.querySelector("#class");
+
+      const optionsList = document.querySelectorAll(".option");
+
+      selected.addEventListener("click", () => {
+        optionsContainer.classList.toggle("active");
+
+        if (optionsContainer.classList.contains("active")) {
+          searchBox.style.display = "block";
+          searchBox.focus();
+          label.style.display = "block";
+        } else {
+          searchBox.style.display = "none";
+          searchBox.value = "";
+          filterList("");
+          const selectedRadio = document.querySelector(
+            "input[name='kelas']:checked"
+          );
+          if (selectedRadio) {
+            label.style.display = "block";
+          } else {
+            label.style.display = "none";
+          }
+        }
+      });
+
+      optionsList.forEach((o) => {
+        o.addEventListener("click", () => {
+          selected.innerHTML = o.querySelector("label").innerHTML;
+          const radioInput = o.querySelector("input[type=radio]");
+          radioInput.checked = true;
+          optionsContainer.classList.remove("active");
+          searchBox.style.display = "none";
+          searchBox.value = "";
+          filterList("");
+        });
+      });
+
+      searchBox.addEventListener("keyup", function (e) {
+        filterList(e.target.value);
+      });
+
+      const filterList = (searchTerm) => {
+        searchTerm = searchTerm.toLowerCase();
+        optionsList.forEach((option) => {
+          let label =
+            option.firstElementChild.nextElementSibling.innerText.toLowerCase();
+          if (label.indexOf(searchTerm) != -1) {
+            option.style.display = "block";
+          } else {
+            option.style.display = "none";
+          }
+        });
+      };
+
+      // END
+
+      // cek konfirmasi password
+
+      const passwordInput = document.getElementById("password");
+      const confirmPasswordInput = document.getElementById("confirm-pass");
+
+      confirmPasswordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (password === confirmPassword) {
+          confirmPasswordInput.setCustomValidity(""); // Password cocok, hapus pesan kesalahan
+        } else {
+          confirmPasswordInput.setCustomValidity(
+            "Confirmation password not match"
+          ); // Password tidak cocok, atur pesan kesalahan
+        }
+      });
+    </script>
+      
+    <!-- MQTT JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.9.0/mqtt.min.js"></script>
+
+    <!-- Handle MQTT Connection -->
+    <script type="application/javascript">
+      // Create MQTT conenction
+      const host = "ws://localhost:9001";
+      const clientId = "JS-MQTT-Client_" + Math.random().toString(16).substr(2, 8);;
+      const subTopic = "Smartendance/ESP8266/Register";
+      const inputUID = document.getElementById("uid-input");
+      const options = {
+        keepalive: 60,
+        clientId: clientId,
+        protocolId: "MQTT",
+        protocolVersion: 4,
+        clean: true,
+        reconnectPeriod: 1000,
+        connectTimeout: 30 * 1000,
+        will: {
+          topic: "WillMsg",
+          payload: "Connection Closed abnormally..!",
+          qos: 0,
+          retain: false,
+        },
+      };
+      console.log("Connecting mqtt client");
+
+      // Create MQTT Client
+      const mqttClient = mqtt.connect(host, options);
+
+      // Get MQTT message
+      mqttClient.on("connect", () => {
+        // Print the message to the console
+        console.log(`Client connected: ${clientId}`);
+        mqttClient.subscribe(subTopic, { qos: 0 });
+      });
+      mqttClient.on("message", (topic, msg, packet) => {
+        console.log(`Received Message: ${msg.toString()} On topic: ${topic}`);
+
+        inputUID.value = msg.toString();
+        console.log(inputUID.value);
+        if (inputUID.value) {
+          wifiLoader.style.display = "none";
+          completeMark.style.display = "block";
+          scanSuccess.style.display = "block";
+          completeMark.classList.add("success");
+          console.log(inputUID.value);
+        } else {
+          wifiLoader.style.display = "flex";
+          completeMark.style.display = "none";
+          scanSuccess.style.display = "none";
+          completeMark.classList.remove("success");
+        }
+      });
+      mqttClient.on("error", (err) => {
+        console.log("Connection error: ", err);
+        mqttClient.end();
+      });
+      mqttClient.on("reconnect", () => {
+        console.log("Reconnecting...");
+      });
+
+      const wifiLoader = document.getElementById("wifi-loader");
+      const completeMark = document.querySelector(".complete-mark");
+      const scanSuccess = document.querySelector(".scan-success");
+
+      // cek form
+      // Fungsi untuk memeriksa apakah data RFID telah diterima
+      function isRFIDDataReceived() {
+        const uidInput = document.getElementById("uid");
+        const uidInputValue = uidInput.value;
+        return uidInputValue.trim() !== ""; // Mengecek apakah nilai tidak kosong (dengan menghapus spasi tambahan)
+      }
+
+      // Fungsi untuk mengeksekusi saat formulir dikirimkan
+      function validateForm() {
+        const selectedRadio = document.querySelector(
+          "input[name='student_class']:checked"
+        );
+
+        if (
+          selectedRadio &&
+          isRFIDDataReceived() &&
+          registrationForm.checkValidity()
+        ) {
+          registrationForm.submit();
+          return true;
+        } else {
+          alert(
+            "Please select the class and wait for the RFID data to be received"
+          );
+          return false;
+        }
+      }
+
+      // Tambahkan event listener ke formulir
+      const registrationForm = document.getElementById("registration-form");
+      registrationForm.addEventListener("submit", (event) => {
+        if (!validateForm()) {
+          event.preventDefault();
+        }
+      });
+
+      const deleteUID = document.querySelector(".delete button");
+
+      deleteUID.addEventListener("click", () => {
+        uidInput.value = "";
+        labelUid.style.display = "none";
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,137 @@
+.content main{
+    width: 100%;
+    padding: 36px 24px;
+    max-height: calc(100vh - 56px);
+}
+
+.content main .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 16px;
+    flex-wrap: wrap;
+}
+
+.content main .header .left h1{
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb{
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+}
+
+.content main .header .left .breadcrumb li{
+    color: var(--dark);
+}
+
+.content main .header .left .breadcrumb li a{
+    color: var(--dark-grey);
+    pointer-events: none;
+}
+
+.content main .header .left .breadcrumb li a.active{
+    color: var(--primary);
+    pointer-events: none;
+}
+
+.content main .insights{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-gap: 24px;
+    margin-top: 80px;
+}
+
+.content main .insights li{
+    padding: 24px;
+    background: var(--light);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    grid-gap: 24px;
+    cursor: pointer;
+}
+
+.content main .insights li:hover{
+    background-color: #aaaaaa55;
+    transition: 0.4s;
+}
+
+.content main .insights li .bx{
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    font-size: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content main .insights li:nth-child(1) .bx{
+    background: var(--light-primary);
+    color: var(--primary);
+}
+
+.content main .insights li:nth-child(2) .bx{
+    background: var(--light-success);
+    color: var(--success);
+}
+
+.content main .insights li .info h3{
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+
+@media screen and (max-width: 1550px) {
+    .content main .insights {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .content main .insights {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content{
+        width: calc(100% - 60px);
+        left: 200px;
+    }
+
+}
+
+@media screen and (max-width: 576px) {
+    .content main .insights{
+        display: grid;
+        grid-template-columns: repeat(auto, minmax(150px, 1fr));
+        grid-gap: 15px;
+        margin-top: 60px;
+    }
+    
+    .content main .insights li{
+        padding: 18px;
+        border-radius: 17px;
+        grid-gap: 15px;
+    }
+    
+    .content main .insights li .bx{
+        font-size: 28px;
+        height: 60px;
+        max-width: 60px;
+        min-width: 60px;
+    }
+    
+    .content main .insights li .info h3{
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+}

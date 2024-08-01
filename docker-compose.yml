@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  # MySQL database for the Smartendance project.
+  smartendance-db:
+    image: mysql:latest
+    container_name: smartendance-db
+    restart: on-failure
+    networks:
+      - smartendance-net
+    ports:
+      - 3306:3306
+    # Change this env variables to your own!
+    environment:
+      - MYSQL_DATABASE=smartendance_db
+      - MYSQL_USER=smartendance
+      - MYSQL_PASSWORD=change_this_default_password!
+      - MYSQL_ROOT_PASSWORD=change_this_root_password!
+    volumes:
+      - smartendance_db:/var/lib/mysql
+
+  # Mosquitto MQTT broker for the Smartendance project.
+  smartendance-mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: smartendance-mqtt
+    restart: on-failure
+    links:
+      - smartendance-web
+    networks:
+      - smartendance-net
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    command: mosquitto -c /mosquitto/config/mosquitto.conf
+
+  # Flask web application for the Smartendance project.
+  smartendance-web:
+    build: ./web
+    container_name: smartendance-web
+    restart: on-failure
+    networks:
+      - smartendance-net
+    ports:
+      - 80:5000
+    env_file:
+      - ./web/.flaskenv-sample
+    depends_on:
+      - smartendance-db
+
+networks:
+  smartendance-net:
+    driver: bridge
+
+volumes:
+  smartendance_db:

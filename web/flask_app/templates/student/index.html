@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='student/style.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='student/SideMenu_Navbar.css')}}"
+    />
+    <title>Student | Dashboard</title>
+  </head>
+
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="logo">
+        <img
+          src="{{url_for('static', filename='images/logo.png')}}"
+          alt="Logo SmarTandance"
+        />
+        <div class="logo-name"><span>SmarTendance</span></div>
+      </a>
+      <ul class="side-menu">
+        <li class="active">
+          <a href="{{url_for('student_ep.dashboard')}}"
+            ><i class="bx bxs-dashboard"></i>Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('student_ep.course')}}"
+            ><i class="bx bxs-graduation"></i>Course</a
+          >
+        </li>
+        <li>
+          <a href="{{url_for('student_ep.view_attendance')}}"
+            ><i class="bx bx-data"></i>My Attendance Logs</a
+          >
+        </li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+          <a
+            href="#"
+            class="logout"
+            id="logout-button"
+            data-logout-url="{{url_for('user_ep.logout')}}"
+          >
+            <i class="bx bx-log-out-circle"></i>
+            Logout
+          </a>
+          <div class="confirmation-modal" id="confirmation-modal">
+            <div class="modal-content">
+              <h2>Logout Confirmation</h2>
+              <p>You sure want to logout?</p>
+              <div class="modal-buttons">
+                <button id="confirm-logout">Yes</button>
+                <button id="cancel-logout">No</button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Navbar -->
+      <nav>
+        <i class="bx bx-menu"></i>
+        <form action="#">
+          <div class="form-input">
+            <input type="search" placeholder="Search..." />
+            <button class="search-btn" type="submit">
+              <i class="bx bx-search"></i>
+            </button>
+          </div>
+        </form>
+        <h3 id="tanggal"></h3>
+        <input type="checkbox" id="theme-toggle" hidden />
+        <label for="theme-toggle" class="theme-toggle"> </label>
+        <a href="#" class="profile">
+          <img
+            src="{{url_for('static', filename='images/profile_logo.png')}}"
+          />
+        </a>
+      </nav>
+
+      <!-- End of Navbar -->
+
+      <main>
+        <div class="header">
+          <div class="left">
+            <h1>Welcome, {{ student.user_fullname }}</h1>
+            <ul class="breadcrumb">
+              <li><a href="" class="active">Dashboard</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <ul class="insights">
+          <li>
+            <i class="bx bxs-graduation"></i>
+            <span class="info">
+              <h3>{{ total_courses }}</h3>
+              <p>Total Courses</p>
+            </span>
+          </li>
+        </ul>
+        <!-- End of Insights -->
+
+        <!-- Tabel Kelas Saya -->
+        <div class="bottom-data">
+          <div class="orders" data-table="course">
+            <div class="header" data-table="course">
+              <i class="bx bxs-book" data-table="course"></i>
+              <h3>Courses</h3>
+              <div class="filter-dropdown">
+                <select id="course-data-filter">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="15">15</option>
+                </select>
+                <i class="bx bx-filter bx-filter-course"></i>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Course Name</th>
+                  <th>Lecturer Name</th>
+                  <th>Time Start</th>
+                  <th>Time End</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for course in student_courses %}
+                <tr>
+                  <td>{{ course.course_name }}</td>
+                  <td>{{ lecturer.user_fullname }}</td>
+                  <td>{{ course.time_start }}</td>
+                  <td>{{ course.time_end }}</td>
+                  <td>{{ course.room_id }}</td>
+                  <td>
+                    {% if course.course_id in attendance_data %} {% for log in
+                    attendance_data[course.course_id] %} {{ log.status.value }}
+                    <br />
+                    {% endfor %} {% else %} No attendance data available {%
+                    endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            <div class="pagination">
+              <button id="mahasiswa-prev-page" disabled>
+                <i class="bx bx-chevrons-left"></i>
+              </button>
+              <span id="mahasiswa-current-page">Page 1</span>
+              <button id="mahasiswa-next-page">
+                <i class="bx bx-chevrons-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{{url_for('static', filename='student/index.js')}}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+          document.body.classList.add("dark");
+          toggler.checked = true;
+        }
+      });
+    </script>
+  </body>
+</html>
