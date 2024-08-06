@@ -1,26 +1,30 @@
-# SmarTendance V1
+# Smartendance V1
 
-## Information
+## Development Environment
 
-- Python        : 3.12.3
-- Docker Engine : WSLv2
+- Operating System  : Windows 11
+- Python version    : 3.12.3
+- Docker Engine     : Kali Linux WSLv2
 
 ## Setup & Installation
 
-1. Build with Docker:
-
-**Recommendation**: If you're using Windows, you can choose `Git Bash`.
+- **Clone Smartendance Repo's**:
 
 ```bash
-docker-compose up --build
+git clone https://github.com/wahyukiddies/Smartendance-Kel2.git
 ```
 
-2. Build From Source
+- **Build with Docker**:
+
+**Recommendation**: If you're using Windows, you can use `Git Bash`.
 
 ```bash
-# Clone smartendance v1 repo
-git clone https://github.com/wahyukiddies/Smartendance-Kel2.git
+docker-compose up -d --build
+```
 
+- **Build From Source**:
+
+```bash
 # Change directory to smartendance v1
 cd web/
 
@@ -30,7 +34,7 @@ sudo apt install -y python3-venv
 sudo apt install -y virtualenv
 
 # Create new virtualenv
-python -m venv .venv
+py -m venv .venv
 
 # Activate virtualenv
 source .venv/Scripts/activate
@@ -43,5 +47,6 @@ pip install -r requirements.txt
 flask db init && flask db migrate -m "Initial db migration" && flask db upgrade
 
 # Finally, you can running the app via wsgi.py file.
-python wsgi.py
+py wsgi.py # Windows
+python3 wsgi.py # Linux/Mac
 ```

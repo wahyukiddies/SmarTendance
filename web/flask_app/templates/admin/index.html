@@ -319,7 +319,13 @@
                 <i class="bx bx-chevrons-right"></i>
               </button>
             </div>
-          </div>
+          <hr>
+          <!-- class deactivate button -->
+          <h3>Deactivate All ESP Boards:</h3>
+          <button onclick="deactivateESP()">Matikan ESP</button>
+          <!-- class activate button -->
+          <h3>Activate All ESP Boards:</h3>
+          <button onclick="activateESP()">Nyalakan ESP</button>
         </div>
       </main>
     </div>
@@ -353,6 +359,7 @@
         </div>
       </div>
     </div>
+    
     <!-- Modal Form Update student -->
     <div class="modal" id="updateModalStudent">
       <div class="modal-content">
@@ -678,6 +685,40 @@
     
         const deleteForm = document.getElementById(`delete${type.charAt(0).toUpperCase() + type.slice(1)}Form`);
         deleteForm.action = `/admin/${id}/delete/${type}`;
+      }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.9.0/mqtt.min.js"></script>
+    <script type="application/javascript">
+      const options = {
+        connectTimeout: 4000,
+        clientId: 'JS-MQTT-CLIENT_' + Math.random().toString(16).substr(2, 8),
+        keepalive: 60,
+        clean: true,
+      }
+      const MQTT_BROKER_URL = 'ws://localhost:9001';
+      const MQTT_PUB_TOPIC1 = "Smartendance/ESP8266/DeactivateESP";
+      const MQTT_PUB_TOPIC2 = "Smartendance/ESP8266/ActivateESP";
+      const mqttClient = mqtt.connect(MQTT_BROKER_URL, options);
+
+      mqttClient.on('connect', () => {
+        console.log('Connected to MQTT broker');
+      });
+
+      mqttClient.on('error', (err) => {
+        console.error('Connection error: ', err);
+      });
+
+      function deactivateESP() {
+        console.log("Deactivating all ESP Boards");
+        mqttClient.publish(MQTT_PUB_TOPIC1, 'deactivate');
+        console.log("Deactivating all ESP Boards success!");
+      }
+
+      function activateESP() {
+        console.log("Activating all ESP Boards");
+        mqttClient.publish(MQTT_PUB_TOPIC2, 'activate');
+        console.log("Activating all ESP Boards success!");
       }
     </script>
   </body>

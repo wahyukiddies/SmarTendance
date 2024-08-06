@@ -422,14 +422,14 @@
     </script>
 
     <!-- MQTT JS Library -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.9.0/mqtt.min.js"></script>
 
     <!-- Handle MQTT Connection -->
     <script type="application/javascript">
       // Create MQTT conenction
-      const host = "ws://broker.emqx.io:8083/mqtt";
-      const clientId = "js_mqtt_client";
-      const subTopic = "SmarTendance/ESP8266/Register";
+      const host = "ws://localhost:9001";
+      const clientId = "JS-MQTT-Client_" + Math.random().toString(16).substr(2, 8);;
+      const subTopic = "Smartendance/ESP8266/Register";
       const inputUID = document.getElementById("uid-input");
       const options = {
         keepalive: 60,

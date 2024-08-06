@@ -1,7 +1,6 @@
 from flask import Flask
 from datetime import datetime, timedelta
 import pytz
-from os import environ
 
 from .config import TestingConfig, ProductionConfig
 from .extensions import argon2, db, migrate, csrf, mqtt
@@ -9,8 +8,9 @@ from .app.views import user_ep, admin_ep, lecturer_ep, student_ep
 from .app.models import *
 
 LOCAL_TZ = 'Asia/Jakarta'
-SUB_TOPIC = 'SmarTendance/ESP32/AttendanceFinal'
-PUB_TOPIC = 'SmarTendance/ESP32/AttendanceFinal/Response'
+# AttendanceFinal topic.
+SUB_TOPIC = 'Smartendance/ESP8266/AttendanceFinal'
+PUB_TOPIC = 'Smartendance/ESP8266/AttendanceFinal/Response'
 
 def get_current_daytime():
   local_timezone = pytz.timezone(LOCAL_TZ)
@@ -58,7 +58,7 @@ def create_app(testing: bool):
     current_daytime = get_current_daytime() # yyyy-mm-dd hh:mm:ss
 
     # Query user with the given rfid
-    found_user = User.query.filter_by(user_rfid_hash=uid).first()
+    found_user = User.query.filter_by(user_rfid=uid).first()
 
     # Exit if user not found
     if not found_user:
@@ -219,7 +219,7 @@ def create_app(testing: bool):
     message = f"100 - Success"
     mqtt.publish(PUB_TOPIC, payload=message, qos=0)
     print(message)
-
+  
   # Handle MQTT message
   @mqtt.on_message()
   def handle_mqtt_message(client, userdata, msg):

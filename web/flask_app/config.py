@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from os import path, environ
 
-# Load flask environment variables (.flaskenv)
-flaskenv_path = path.join(path.dirname(__file__), "../.flaskenv")
+# Load flask environment variables (.flaskenv-sample)
+flaskenv_path = path.join(path.dirname(__file__), "../.flaskenv-sample")
 load_dotenv(flaskenv_path)
 
 # DbConfig configuration

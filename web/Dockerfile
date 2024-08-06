@@ -14,13 +14,17 @@ WORKDIR /home/smartendance/web
 # Copying all the files to the working directory, including .flaskenv file
 COPY . /home/smartendance/web
 
+# Download and set permission for wait-for-it.sh
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /home/smartendance/web/wait-for-it.sh
+RUN chmod +x /home/smartendance/web/wait-for-it.sh
+
 # Installing required dependencies
 RUN pip3 install -r requirements.txt --no-cache-dir
 # Add execute permission to the entrypoint script
 RUN chmod +x entrypoint.sh
 
 # Exposing the port
-EXPOSE 5555
+EXPOSE 5000
 
 # Running the application via entrypoint script
 CMD [ "./entrypoint.sh" ]

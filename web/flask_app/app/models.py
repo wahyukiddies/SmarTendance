@@ -53,7 +53,7 @@ class User(db.Model):
   user_role = Column(Enum(RoleName), nullable=False)
   user_fullname = Column(String(200), nullable=False)
   user_password_hash = Column(String(256), nullable=False)
-  user_rfid_hash = Column(String(256), nullable=True, unique=True)
+  user_rfid = Column(String(256), nullable=True, unique=True)
   user_email_address = Column(String(100), nullable=False, unique=True)
   user_home_address = Column(String(256), nullable=True)
   lecturer_major = Column(Enum(Major), nullable=True)
@@ -79,10 +79,10 @@ class User(db.Model):
   
   @rfid.setter
   def rfid(self, rfid):
-    self.user_rfid_hash = generate_password_hash(rfid)
+    self.user_rfid = generate_password_hash(rfid)
   
   def verify_rfid(self, rfid):
-    return check_password_hash(self.user_rfid_hash, rfid)
+    return check_password_hash(self.user_rfid, rfid)
 
 class Course(db.Model):
   __tablename__ = 'course'

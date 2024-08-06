@@ -3,14 +3,12 @@ Dockerfile
 .DS_Store
 .gitignore
 .dockerignore
-docker-compose.yaml
+docker-compose.yml
 
 # Python3 virtual environment
 .venv/
 .flaskenv
-
-# MySQL DB environment
-.mysqlenv
+.env
 
 /credentials
 /cache

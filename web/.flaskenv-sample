@@ -1,0 +1,4 @@
+SECRET_KEY=change_with_your_super_secret_key!
+DATABASE_URL=mysql+pymysql://smartendance:change_this_default_password!@smartendance-db/smartendance_db
+MQTT_BROKER_URL=smartendance-mqtt
+MQTT_BROKER_PORT=1883
