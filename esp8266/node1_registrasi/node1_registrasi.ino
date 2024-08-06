@@ -1,5 +1,8 @@
+// KELOMPOK 2 - Smartendance
 // Node 1: Registrasi
+// WORK ONLY ON ESP8266 !
 
+/* REQUIRED LIBRARIES */
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
@@ -14,17 +17,17 @@ const byte RST_PIN = D0;
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 /* WIFI CREDENTIALS */
-const char* WIFI_SSID = "POCO M3 Pro 5G";
-const char* WIFI_PASS = "Awikwok123456";
+const char* WIFI_SSID = "Rahasia"; // Update this to your own WiFi ssid.
+const char* WIFI_PASS = "rahasiatuhan";  // Update this to your own WiFi password.
 WiFiClient espClient;
 
 /* MQTT BROKER CREDENTIALS */
-const char* MQTT_HOST = "192.168.135.252";
-const int MQTT_PORT = 1883;
+const char* MQTT_HOST = "192.168.237.252"; // Update this to your PC/device IP address which is the MQTT broker/host.
+const int MQTT_PORT = 1883; // Don't change the default mqtt port until you change the `mosquitto.conf` configuration in the source code.
 const char* MQTT_USER = ""; // leave blank if no credentials used
 const char* MQTT_PASS = ""; // leave blank if no credentials used
-const char* CLIENT_NAME = "Node1_Registrasi_ESP8266";
-const char* MQTT_PUB_TOPIC = "Smartendance/ESP8266/Register";
+const char* CLIENT_NAME = "Node1_Registrasi_ESP8266"; // You can change this client name (optional).
+const char* MQTT_PUB_TOPIC = "Smartendance/ESP8266/Register"; // Don't change this publish topic.
 PubSubClient mqttClient(espClient);
 
 /* LCD SETUP */
@@ -35,6 +38,15 @@ unsigned long lastScanTime = 0;
 const unsigned long scanBlockDuration = 5000; // 5 seconds
 
 bool isDeactivated = false;
+
+// Variabel RSSI untuk menghitung kekuatan sinyal.
+int rssi = 0;
+// Variabel sendTime dan receiveTime untuk menghitung latensi.
+unsigned long sendTime, receiveTime;
+
+// Timer untuk pengecekan WiFi dan MQTT
+unsigned long lastWiFiCheck = 0;
+unsigned long lastMqttCheck = 0;
 
 void connectWiFi() {
   Serial.print("Connecting to WiFi...");
@@ -78,7 +90,6 @@ void connectMqttBroker() {
       Serial.print(mqttClient.state());
       Serial.println(": Connection to MQTT broker failed!");
       Serial.println("Try again in 3 seconds.");
-      /* Wait 3 seconds before retrying */
       delay(3000);
     }
   }
@@ -96,36 +107,29 @@ void publishUID(const char* uid) {
       lcd.setCursor(0, 0);
       lcd.print(uid);
       lcd.setCursor(0, 1);
-      lcd.print("UID Sended");
+      lcd.print("UID Sent");
 
       // Set the flag and record the last scan time
       cardScanned = true;
       lastScanTime = millis();
-
-      // Add a delay before clearing the display
-      delay(2000); // Adjust as needed
     } else {
       Serial.println("Failed to publish success message");
       lcd.setCursor(0, 0);
       lcd.print(uid);
       lcd.setCursor(0, 1);
-      lcd.print("UID Not Sended");
+      lcd.print("UID Not Sent");
 
-      // Add a delay before clearing the display
-      delay(3000); // Adjust as needed
+      initializeText();
     }
-
-    initializeText("# SmarTendance #"); // Call after the delay
   }
 }
 
-void initializeText(const char* text){
+void initializeText(){
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(text);
+  lcd.print("# Smartendance #");
   lcd.setCursor(0, 1);
-  lcd.print("Tap the card");
-  delay(1000);
+  lcd.print("Tap your card");
 }
 
 void onReceive(uint8_t *macAddr, uint8_t *data, uint8_t dataLen) {
@@ -133,30 +137,45 @@ void onReceive(uint8_t *macAddr, uint8_t *data, uint8_t dataLen) {
   Serial.print("Received message: ");
   Serial.println(message);
 
-  if (message.equalsIgnoreCase("activate")) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Normal kembali");
-    isDeactivated = false;
-    digitalWrite(LED_BUILTIN, LOW); // Turn off LED
-  } else if (message.equalsIgnoreCase("deactivate")) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Gagal registrasi");
-    lcd.setCursor(0, 1);
-    lcd.print("ESP dimatikan");
+  if (message.equalsIgnoreCase("deactivate")) {
     isDeactivated = true;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("# Deactivated #");
+    lcd.setCursor(0, 1);
+    lcd.print("Lock Absensi");
+  } else if (message.equalsIgnoreCase("activate")) {
+    isDeactivated = false;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("# Activated #");
+    lcd.setCursor(0, 1);
+    lcd.print("Unlock Absensi");
   }
-}
 
+  // Dapatkan RSSI
+  rssi = WiFi.RSSI();
+  Serial.print("RSSI: ");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+
+  unsigned long responseTime = millis();
+  String callback = "received," + WiFi.macAddress() + "," + message; // Append MAC address to the message
+  esp_now_send(macAddr, (uint8_t *)message.c_str(), message.length());
+  Serial.print("Sent response to ");
+  for (int i = 0; i < 6; i++) {
+    Serial.print(macAddr[i], HEX);
+    if (i < 5) Serial.print(":");
+  }
+  Serial.print(". Message: ");
+  Serial.println(callback);
+}
 
 void setup() {
   Serial.setDebugOutput(true);
   Serial.begin(115200);
   SPI.begin();
   mfrc522.PCD_Init();
-
-  pinMode(LED_BUILTIN, OUTPUT);
 
   connectWiFi();
 
@@ -165,10 +184,15 @@ void setup() {
 
   // Initialize LCD
   lcd.init();
-  lcd.backlight(); // Turn on backlight (change to HIGH if active low)
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Connected to WiFi");
+  lcd.setCursor(0, 1);
+  lcd.print("IP: " + WiFi.localIP().toString());
+  delay(2000);
+  lcd.clear();
 
-  initializeText("# SmarTendance #");
-  delay(1000);
+  initializeText();
 
   // Initialize ESPNOW
   if (esp_now_init() != 0) {
@@ -180,29 +204,47 @@ void setup() {
 }
 
 void loop() {
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWiFi();
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - lastWiFiCheck >= 5000) { // Check WiFi connection every 5 seconds
+    lastWiFiCheck = currentMillis;
+    if (WiFi.status() != WL_CONNECTED) {
+      connectWiFi();
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Connecting to");
+      lcd.setCursor(0, 1);
+      lcd.print("WiFi............");
+      delay(2000);
+      lcd.clear();
+    }
   }
 
-  if (!mqttClient.connected()) {
-    connectMqttBroker();
-  } else {
-    mqttClient.loop();
+  if (currentMillis - lastMqttCheck >= 5000) { // Check MQTT connection every 5 seconds
+    lastMqttCheck = currentMillis;
+    if (!mqttClient.connected()) {
+      connectMqttBroker();
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Connecting to");
+      lcd.setCursor(0, 1);
+      lcd.print("MQTT broker.....");
+      delay(2000);
+      lcd.clear();
+    }
   }
+  mqttClient.loop(); // Process MQTT messages.
 
-  unsigned long currentTime = millis();
-
-  // Unblock card scanning after the specified duration
-  if (cardScanned && (currentTime - lastScanTime >= scanBlockDuration)) {
+  if (cardScanned && (currentMillis - lastScanTime >= scanBlockDuration)) {
     cardScanned = false;
+    initializeText();
   }
 
   if (!isDeactivated) {
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
       String uid = readUID();
+      sendTime = millis(); // Save send time to calculate the latency.
       publishUID(uid.c_str());
     }
-  } else {
-    digitalWrite(LED_BUILTIN, (millis() / 500) % 2); // Blink LED_BUILTIN every 500 ms
   }
 }

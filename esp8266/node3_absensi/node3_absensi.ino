@@ -1,5 +1,8 @@
+// KELOMPOK 2 - Smartendance
 // Node3: Absensi
+// WORK ONLY ON ESP8266 !
 
+/* REQUIRED LIBRARIES */
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <ESP8266WiFi.h>
@@ -14,17 +17,17 @@ const byte RST_PIN = D0; // Update this according to your wiring
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 /* WIFI CREDENTIALS */
-const char* WIFI_SSID = "POCO M3 Pro 5G";
-const char* WIFI_PASS = "Awikwok123456";
+const char* WIFI_SSID = "Rahasia"; // Update this to your own WiFi ssid.
+const char* WIFI_PASS = "rahasiatuhan";  // Update this to your own WiFi password.
 
 /* MQTT BROKER CREDENTIALS */
-const char* MQTT_HOST = "192.168.135.252";
-const int MQTT_PORT = 1883;
+const char* MQTT_HOST = "192.168.237.252"; // Update this to your PC/device IP address which is the MQTT broker/host.
+const int MQTT_PORT = 1883; // Don't change the default mqtt port until you change the `mosquitto.conf` configuration in the source code.
 const char* MQTT_USER = ""; // leave blank if no credentials used
 const char* MQTT_PASS = ""; // leave blank if no credentials used
-const char* CLIENT_NAME = "Node3_Absensi_ESP8266";
-const char* MQTT_PUB_TOPIC = "Smartendance/ESP8266/AttendanceFinal";
-const char* MQTT_SUB_TOPIC = "Smartendance/ESP8266/AttendanceFinal/Response";
+const char* CLIENT_NAME = "Node3_Absensi_ESP8266"; // You can change this client name (optional).
+const char* MQTT_PUB_TOPIC = "Smartendance/ESP8266/AttendanceFinal"; // Don't change this publish topic.
+const char* MQTT_SUB_TOPIC = "Smartendance/ESP8266/AttendanceFinal/Response"; // Don't change this subs topic.
 
 const int I2C_SDA = D3;
 const int I2C_SCL = D4;
@@ -39,15 +42,24 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); // Address 0x27, 16 columns and 2 rows
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
+// Variabel RSSI untuk menghitung kekuatan sinyal.
+int rssi = 0;
+// Variabel sendTime dan receiveTime untuk menghitung latensi.
+unsigned long sendTime, receiveTime;
+// Variabel untuk mengelola timer non-blocking
+unsigned long lastWiFiCheck = 0;
+unsigned long lastMqttCheck = 0;
+unsigned long lastReadTime = 0;
+
 /* FUNCTION DECLARATIONS */
 void connectWiFi();
 String readUID();
 void connectMqttBroker();
 bool publishUID(const char* uid);
-bool waitForConfirmation();
 void initializeText();
 void callback(char* topic, byte* payload, unsigned int length);
 void onReceive(uint8_t *macAddr, uint8_t *data, uint8_t dataLen);
+void sendMessageBack(uint8_t *address, String message);
 
 void callback(char* topic, byte* payload, unsigned int length) {
   char status[4];
@@ -99,7 +111,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     lcd.setCursor(0, 1);
     lcd.print("Role not found");
   }
-  delay(2000);
 }
 
 void connectWiFi() {
@@ -132,9 +143,8 @@ String readUID() {
   return uid;
 }
 
-
 void connectMqttBroker() {
-  while (!mqttClient.connected() && WiFi.status() == WL_CONNECTED && !mqttClient.subscribe(MQTT_SUB_TOPIC)){
+  while (!mqttClient.connected() && WiFi.status() == WL_CONNECTED) {
     Serial.println("Connecting to MQTT broker: " + String(MQTT_HOST));
     if (mqttClient.connect(CLIENT_NAME)) {
       Serial.println("Connected to MQTT broker: " + String(MQTT_HOST));
@@ -145,12 +155,10 @@ void connectMqttBroker() {
       Serial.print(mqttClient.state());
       Serial.println(": Connection to MQTT broker failed!");
       Serial.println("Try again in 3 seconds.");
-      /* Wait 3 seconds before retrying */
       delay(3000);
     }
   }
 }
-
 
 bool publishUID(const char* uid) {
   Serial.print("Attempting to publish UID: ");
@@ -173,27 +181,44 @@ void onReceive(uint8_t *macAddr, uint8_t *data, uint8_t dataLen) {
   Serial.print("Received message: ");
   Serial.println(message);
 
-  if (message.equalsIgnoreCase("activate")) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Normal kembali");
-    isDeactivated = false;
-    digitalWrite(LED_BUILTIN, LOW); // Turn off LED
-  } else if (message.equalsIgnoreCase("deactivate")) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Gagal absensi");
-    lcd.setCursor(0, 1);
-    lcd.print("ESP dimatikan");
+  // Logika apabila terdapat pesan dikirimkan dari Node2.
+  if (message.equalsIgnoreCase("deactivate")) {
     isDeactivated = true;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("# Deactivated #");
+    lcd.setCursor(0, 1);
+    lcd.print("Lock Absensi");
+  } else if (message.equalsIgnoreCase("activate")) {
+    isDeactivated = false;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("# Activated #");
+    lcd.setCursor(0, 1);
+    lcd.print("Unlock Absensi");
   }
+
+  // Dapatkan RSSI
+  rssi = WiFi.RSSI();
+  Serial.print("RSSI: ");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+
+  unsigned long responseTime = millis();
+  String callback = "received," + WiFi.macAddress() + "," + message; // Append MAC address to the message
+  esp_now_send(macAddr, (uint8_t *)message.c_str(), message.length());
+  Serial.print("Sent response to ");
+  for (int i = 0; i < 6; i++) {
+    Serial.print(macAddr[i], HEX);
+    if (i < 5) Serial.print(":");
+  }
+  Serial.print(". Message: ");
+  Serial.println(callback);
 }
 
 void setup() {
   Serial.setDebugOutput(true);
   Serial.begin(115200);
-
-  pinMode(LED_BUILTIN, OUTPUT);
 
   Wire.begin(I2C_SDA, I2C_SCL);
   SPI.begin();
@@ -205,12 +230,12 @@ void setup() {
   connectMqttBroker();
 
   // Initialize LCD
-  lcd.begin(16, 2);
+  lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("Connected to WiFi");
   lcd.setCursor(0, 1);
-  lcd.print("IP: " + WiFi.localIP().toString());
+  lcd.print("IP:" + WiFi.localIP().toString());
   delay(2000);
   lcd.clear();
 
@@ -231,54 +256,61 @@ void setup() {
 void initializeText(){
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("SmarTendance");
+  lcd.print("# Smartendance #");
   lcd.setCursor(0, 1);
-  lcd.print("Scan the card");
-  delay(1000);
+  lcd.print("Tap your card");
 }
 
 void loop() {
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWiFi();
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Connecting to WiFi...");
-    delay(2000);
-    lcd.clear();
-  }
+  unsigned long currentMillis = millis();
 
-  if (!mqttClient.connected() || !mqttClient.subscribe(MQTT_SUB_TOPIC)) {
-    connectMqttBroker();
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Connecting to MQTT...");
-    delay(2000);
-    lcd.clear();
-  }
-  else {
-    mqttClient.loop();
-  }
-  
-  if (!isDeactivated) {
-    String uid = readUID();
-    if (uid.length() > 0) {
-      bool success = publishUID(uid.c_str());
-
-      if(!success) {
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("Failed!");
-        lcd.setCursor(0,1);
-        lcd.print("MQTT publish");
-        delay(2000);
-        lcd.clear();
-        initializeText();
-      }
+  if (currentMillis - lastWiFiCheck >= 5000) { // Check WiFi connection every 5 seconds
+    lastWiFiCheck = currentMillis;
+    if (WiFi.status() != WL_CONNECTED) {
+      connectWiFi();
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Connecting to");
+      lcd.setCursor(0, 1);
+      lcd.print("WiFi............");
       delay(2000);
       lcd.clear();
-      initializeText();
     }
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH); // Turn on LED to indicate deactivated state
+  }
+
+  if (currentMillis - lastMqttCheck >= 5000) { // Check MQTT connection every 5 seconds
+    lastMqttCheck = currentMillis;
+    if (!mqttClient.connected()) {
+      connectMqttBroker();
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Connecting to");
+      lcd.setCursor(0, 1);
+      lcd.print("MQTT broker.....");
+      delay(2000);
+      lcd.clear();
+    }
+  }
+
+  mqttClient.loop(); // Process MQTT messages.
+
+  if (!isDeactivated) {
+    if (currentMillis - lastReadTime >= 1000) { // Read UID every second
+      lastReadTime = currentMillis;
+      String uid = readUID();
+      if (uid.length() > 0) {
+        bool success = publishUID(uid.c_str());
+        if(!success) {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Failed!");
+          lcd.setCursor(0,1);
+          lcd.print("MQTT publish");
+          delay(2000);
+          lcd.clear();
+          initializeText();
+        }
+      }
+    }
   }
 }
