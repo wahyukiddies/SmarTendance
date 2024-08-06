@@ -697,8 +697,8 @@
         clean: true,
       }
       const MQTT_BROKER_URL = 'ws://localhost:9001';
-      const MQTT_PUB_TOPIC1 = "Smartendance/ESP8266/DeactivateClass";
-      const MQTT_PUB_TOPIC2 = "Smartendance/ESP8266/ActivateClass";
+      const MQTT_PUB_TOPIC1 = "Smartendance/ESP8266/DeactivateESP";
+      const MQTT_PUB_TOPIC2 = "Smartendance/ESP8266/ActivateESP";
       const mqttClient = mqtt.connect(MQTT_BROKER_URL, options);
 
       mqttClient.on('connect', () => {

@@ -12,10 +12,6 @@ LOCAL_TZ = 'Asia/Jakarta'
 SUB_TOPIC = 'Smartendance/ESP8266/AttendanceFinal'
 PUB_TOPIC = 'Smartendance/ESP8266/AttendanceFinal/Response'
 
-# Activate/Deactivate class topic.
-# SUB_TOPIC2 = 'Smartendance/ESP32/ActivateClass'
-# PUB_TOPIC2 = 'Smartendance/ESP32/ActivateClass/Response'
-
 def get_current_daytime():
   local_timezone = pytz.timezone(LOCAL_TZ)
   return datetime.now(local_timezone)
@@ -223,39 +219,6 @@ def create_app(testing: bool):
     message = f"100 - Success"
     mqtt.publish(PUB_TOPIC, payload=message, qos=0)
     print(message)
-    
-  # Buatkan fungsi untuk menghandle pesan MQTT apabila SUB_TOPIC2 ada pesan untuk menonaktifkan kelas, maka data student attendance logs dan lecturer attendance logs akan diupdate statusnya menjadi "Libur",
-  
-  def deactivate_class(uid: str) -> bool:
-    current_time = get_current_time()
-    current_day = get_current_day()
-    current_daytime = get_current_daytime()
-    
-    found_user = User.query.filter_by(user_role="STUDENT").all()
-    
-    for user in found_user:
-      found_course = Course.query.filter(
-        Course.class_id==user.student_class,
-        Course.day==current_day,
-        Course.time_start<=current_time,
-        Course.time_end>current_time
-      ).first()
-      
-      if found_course:
-        time_start_with_date = datetime.combine(current_daytime, found_course.time_start)
-        time_end_with_date = datetime.combine(current_daytime, found_course.time_end)
-        
-        found_student_log = StudentAttendanceLogs.query.filter(
-          StudentAttendanceLogs.student_nim==user.user_id,
-          StudentAttendanceLogs.course_id==found_course.course_id,
-          StudentAttendanceLogs.time_in.between(time_start_with_date, time_end_with_date)
-        ).first()
-        
-        if found_student_log:
-          found_student_log.status = "LIBUR"
-          db.session.commit()
-    
-      return True
   
   # Handle MQTT message
   @mqtt.on_message()
